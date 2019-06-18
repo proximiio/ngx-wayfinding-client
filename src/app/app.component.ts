@@ -20,7 +20,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private authListenerSubs: Subscription;
 
   constructor(
-    private sidebarService: SidebarService,
+    public sidebarService: SidebarService,
     private authService: AuthService,
     private breakpointObserver: BreakpointObserver,
     overlayContainer: OverlayContainer

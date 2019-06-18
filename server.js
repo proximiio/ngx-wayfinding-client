@@ -61,5 +61,5 @@ app.get(Settings.basepath+'/*',(req,res) =>{
 
 var server = http.createServer(app);
 server.listen(httpPort, '127.0.0.1', () => {
-  console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}/${Settings.basepath} **`)
+  console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}${Settings.basepath} **`)
 });
