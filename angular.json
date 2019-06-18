@@ -23,11 +23,14 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": false,
+            "baseHref": "/wayfinding/",
             "assets": [
               "src/favicon.ico",
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/mapbox-gl/dist/mapbox-gl.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -88,6 +91,8 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/mapbox-gl/dist/mapbox-gl.css",
               "src/styles.scss"
             ],
             "scripts": []

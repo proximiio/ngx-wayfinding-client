@@ -1,0 +1,416 @@
+<div (resized)="onResized($event)">
+  <a href="javascript:;" (click)="sidebarService.toggleSidebar();" class="toggle-sidebar">
+    <fa-icon [icon]="['fal', 'ellipsis-v']" size="lg"></fa-icon>
+  </a>
+  <div class="map-floors">
+    <ul>
+      <li>
+        <span *ngIf="endPoi && level !== endPoi.level && level < endPoi.level">{{ endPoi.level }}</span>
+        <a href="javascript:;"
+           [ngClass]="{'blinking': endPoi && level !== endPoi.level && level < endPoi.level}"
+           (click)="onFloorChange('up')">
+          <fa-icon [icon]="['fal', 'chevron-up']"></fa-icon>
+        </a>
+      </li>
+      <li class="current-floor">{{ selectedFloor ? selectedFloor.level : 0 }}</li>
+      <li>
+        <span *ngIf="endPoi && level !== endPoi.level && level > endPoi.level">{{ endPoi.level }}</span>
+        <a href="javascript:;"
+           [ngClass]="{'blinking': endPoi && level !== endPoi.level && level > endPoi.level}"
+           (click)="onFloorChange('down')">
+          <fa-icon [icon]="['fal', 'chevron-down']"></fa-icon>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <mgl-map
+    [style]="mapStyle"
+    [zoom]="mapZoom"
+    [center]="mapCenter"
+    [pitch]="mapPitch"
+    [bearing]="mapBearing"
+    [movingMethod]="mapMovingMethod"
+    (load)="onLoad($event)"
+  >
+    <ng-container *ngFor="let key of objectKeys(images)">
+      <mgl-image
+        [id]="key"
+        [url]="images[key].uri"
+      >
+      </mgl-image>
+    </ng-container>
+    <mgl-geojson-source
+      [id]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [data]="featuresForLevel(level, false)"
+      [maxzoom]="24"
+    >
+    </mgl-geojson-source>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_FLOORS"
+      [before]="showRaster ? lastFloorLayer : null"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+           ['==', ['get', 'type'], 'floor'],
+           ['==', ['get', 'category'], 'base_floor'],
+           ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color'],
+          'fill-opacity': 0.7
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="line"
+      [id]="Constants.LAYER_FLOORS_LINES"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'floor'],
+          ['==', ['get', 'category'], 'room'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'line-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_BASE_FLOOR"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'base_floor'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_ROAD"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'road'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_AREAS"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'area'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_PARKING_BASE"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'parking_base'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill-extrusion"
+      [id]="Constants.LAYER_SHOPS"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'shop'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-extrusion-color': ['get', 'color'],
+          'fill-extrusion-height': ['to-number', ['get', 'height']],
+          'fill-extrusion-base': 0.1,
+          'fill-extrusion-opacity': 0.8
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_ROOMS"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'room'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill"
+      [id]="Constants.LAYER_HOLES"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'hole'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-color': ['get', 'color']
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill-extrusion"
+      [id]="Constants.LAYER_WALLS"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'wall'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-extrusion-color': ['get', 'color'],
+          'fill-extrusion-height': 4,
+          'fill-extrusion-base': 0.1,
+          'fill-extrusion-opacity': 1
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_LEVELCHANGERS"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="16"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'usecase'], 'levelchanger']
+        ]"
+      [paint]="{}"
+      [layout]="{
+          'icon-image': '{levelchanger}',
+          'icon-size': iconSize,
+          'text-offset': [0, 1],
+          'text-field': ['get', 'title'],
+          'text-size': 14,
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'text-allow-overlap': true,
+          'visibility': showLevelChangers ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="fill-extrusion"
+      [id]="Constants.LAYER_POLYGONS_ABOVE_PATHS"
+      [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
+      [minzoom]="12"
+      [maxzoom]="24"
+      [filter]="[
+          'all',
+          ['==', ['get', 'type'], 'polygon_above_path'],
+          ['==', ['to-number', ['get', 'level']], level]
+        ]"
+      [paint]="{
+          'fill-extrusion-color': ['get', 'color'],
+          'fill-extrusion-height': ['to-number', ['get', 'height']],
+          'fill-extrusion-base': 0.1,
+          'fill-extrusion-opacity': 0.8
+        }"
+      [layout]="{
+          'visibility': showGeoJSON ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-geojson-source
+      [id]="Constants.SOURCE_POI"
+      [data]="featuresForLevel(level, true)"
+      [maxzoom]="24"
+    ></mgl-geojson-source>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_POIS_ICONS"
+      [source]="Constants.SOURCE_POI"
+      [minzoom]="17"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'poi'],
+            ['==', ['to-number', ['get', 'level']], level]
+          ]
+        "
+      [layout]="{
+          'icon-image': '{amenity}',
+          'icon-size': iconSize,
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          'text-allow-overlap': true,
+          'visibility': showPOI ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_POIS_LABELS"
+      [source]="Constants.SOURCE_POI"
+      [minzoom]="18"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'poi'],
+            ['==', ['to-number', ['get', 'level']], level]
+          ]
+        "
+      [layout]="{
+          'text-offset': [0, 2],
+          'text-field': ['get', 'title'],
+          'text-size': 14,
+          'text-font': [font],
+          'symbol-placement': 'point',
+          'text-allow-overlap': false,
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          'visibility': showPOI ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-geojson-source
+      [id]="Constants.SOURCE_ROUTING"
+      [data]="routeCollection"
+      [maxzoom]="24"
+    ></mgl-geojson-source>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_ROUTING_SYMBOLS"
+      [source]="Constants.SOURCE_ROUTING"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'route-symbol'
+          ]
+        "
+      [layout]="{
+          'icon-image': '{icon}',
+          'icon-size': 0.4,
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'text-allow-overlap': false,
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_FLOORCHANGE_SYMBOLS"
+      [source]="Constants.SOURCE_ROUTING"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'floor-change-symbol'
+          ]
+        "
+      [layout]="{
+          'icon-image': '{icon}',
+          'icon-size': 0.3,
+          'icon-offset': way === 'up' ? [4, -80] : [4, 70],
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'text-allow-overlap': false,
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_ROUTING_SYMBOLS + '_line'"
+      [source]="Constants.SOURCE_ROUTING"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'route-line-symbol'
+          ]
+        "
+      [layout]="{
+          'icon-image': 'bluedot',
+          'icon-size': 0.25,
+          'symbol-placement': 'point',
+          'icon-allow-overlap': false,
+          'text-allow-overlap': false,
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="line"
+      [id]="Constants.LAYER_ROUTING_LINE"
+      [source]="Constants.SOURCE_ROUTING"
+      [minzoom]="10"
+      [maxzoom]="24"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'route-line'
+          ]
+        "
+      [paint]="routeLineStyle"
+      [layout]="{
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+  </mgl-map>
+</div>

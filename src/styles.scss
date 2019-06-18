@@ -1,1 +1,57 @@
 /* You can add global styles to this file, and also import other style files */
+// @import "~@ng-select/ng-select/themes/material.theme.css";
+
+@import '~@angular/material/theming';
+
+// always include only once per project
+@include mat-core();
+
+// import our custom theme
+@import 'themes/default-theme.scss';
+@import 'themes/custom-theme.scss';
+@import 'themes/black-theme.scss';
+
+// import custom componenet themes
+// unofficial naming convention to support nice ordering of files in IDE
+// to see theme under the original style file of the componenent
+@import 'styles/ng-select.scss-theme';
+
+// you only have to add additional componenets here (instead of in every theme class)
+@mixin custom-components-theme($theme) {
+  @include ng-select-theme($theme);
+}
+
+// specify theme class eg: <body class="my-theme"> ... </body>
+.default-theme {
+  // use our theme with angular-material-theme mixin
+  @include angular-material-theme($default-theme);
+  // include custom components theme mixin once per theme class
+  @include custom-components-theme($default-theme);
+}
+.custom-theme {
+  @include angular-material-theme($custom-theme);
+  @include custom-components-theme($custom-theme);
+}
+.black-theme {
+  @include angular-material-theme($black-theme);
+  @include custom-components-theme($black-theme);
+}
+
+.ng-fa-icon {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-transform:rotateZ(0);
+  -moz-transform:rotateZ(0);
+  -o-transform:rotateZ(0);
+  transform:rotateZ(0);
+}
+
+.theme-wrapper {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

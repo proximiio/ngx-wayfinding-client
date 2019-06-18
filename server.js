@@ -1,0 +1,65 @@
+var http = require('http');
+var express = require('express');
+var app = express();
+var Settings = require('./settings');
+var httpPort = process.env.PORT || Settings.port;
+var bodyParser = require('body-parser');
+var cors = require('cors');
+const axios = require('axios');
+const _ = require('lodash');
+const path = require('path');
+
+const proximiApiInstance = axios.create({
+  baseURL: Settings.proximi_api
+});
+proximiApiInstance.defaults.headers.common['Authorization'] = `Bearer ${Settings.token}`;
+
+app.use(cors());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
+
+app.use(Settings.basepath, express.static(__dirname + '/dist/ngx-wayfinding-client'));
+
+app.get(Settings.basepath+'/token', function(request, response) {
+  response.send(Settings.token);
+});
+
+app.get(Settings.basepath+'/auth', async (request, response, next) => {
+  try {
+    const currentUser = await proximiApiInstance.get(`/core/current_user`);
+    const config = await proximiApiInstance.get(`/config`);
+    const floors = await proximiApiInstance.get(`/core/floors`);
+    const features = await proximiApiInstance.get(`/v4/geo/features`);
+    const amenities = await proximiApiInstance.get(`/v4/geo/amenities`);
+
+    features.data.features = features.data.features.map(feature => {
+      if (!feature.properties.title) {
+        feature.properties.title = '';
+      }
+      return feature;
+    });
+
+    response.send({
+      user: currentUser.data,
+      config: config.data,
+      data: {
+        floors: _.sortBy(floors.data, ['level']),
+        features: features.data,
+        amenities: amenities.data
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get(Settings.basepath+'/*',(req,res) =>{
+  res.sendFile(path.join(__dirname,'dist/ngx-wayfinding-client/index.html'));
+});
+
+var server = http.createServer(app);
+server.listen(httpPort, '127.0.0.1', () => {
+  console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}/${Settings.basepath} **`)
+});

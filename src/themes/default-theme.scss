@@ -1,0 +1,45 @@
+$default-palette: (
+  50 : #e8fbf0,
+  100 : #c6f5d8,
+  200 : #a0eebf,
+  300 : #79e7a5,
+  400 : #5de191,
+  500 : #40dc7e,
+  600 : #3ad876,
+  700 : #32d36b,
+  800 : #2ace61,
+  900 : #1cc54e,
+  A100 : #fbfffc,
+  A200 : #c8ffd6,
+  A400 : #95ffb1,
+  A700 : #7bff9e,
+  contrast: (
+    50: $black-87-opacity,
+    100: $black-87-opacity,
+    200: $black-87-opacity,
+    300: $black-87-opacity,
+    400: $black-87-opacity,
+    500: white,
+    600: white,
+    700: white,
+    800: $white-87-opacity,
+    900: $white-87-opacity,
+    A100: $black-87-opacity,
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+// define 3 theme color
+// mat-palette accepts $palette-name, main, lighter and darker variants
+$default-theme-primary: mat-palette($default-palette, A100, 300, 900);
+$default-theme-accent: mat-palette($mat-light-blue);
+$default-theme-warn: mat-palette($default-palette);
+
+// create theme (use mat-dark-theme for themes with dark backgrounds)
+$default-theme: mat-dark-theme(
+    $default-theme-primary,
+    $default-theme-accent,
+    $default-theme-warn
+);

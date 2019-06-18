@@ -1,0 +1,104 @@
+.sidebar {
+  padding: 0 1rem 1rem;
+
+  .brand {
+    background-color: white;
+    padding: 20px 10px;
+    width: 120px;
+    border-radius: 0 0 6px 6px;
+    margin-bottom: 2rem;
+
+    img {
+      width: 100%;
+    }
+  }
+
+  .close-sidebar {
+    position: absolute;
+    z-index: 9;
+    right: 10px;
+    top: 10px;
+    display: block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    background-color: transparent;
+    border-radius: 50%;
+    color: rgba(255, 255, 255, .87);
+    border: 2px solid rgba(255, 255, 255, .87);
+    text-align: center;
+    transition: all .25s ease-in-out;
+
+    &:hover {
+      background-color: white;
+      color: #ff4c6a;
+    }
+  }
+
+  .mat-form-field {
+    width: 100%;
+  }
+
+  ::ng-deep .ng-option {
+    >img {
+      vertical-align: middle;
+      margin-top: -5px;
+    }
+    >span {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: block;
+      border: 1px solid #222;
+      color: #222;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+    }
+  }
+
+  ::ng-deep {
+    .mat-form-field-flex {
+      align-items: normal;
+    }
+    .mat-form-field-prefix {
+      width: 24px;
+      bottom: -23px;
+    }
+    .ng-dropdown-panel {
+      background-color: white;
+      color: rgba(0, 0, 0, 0.87) !important;
+      .ng-dropdown-panel-items {
+        .ng-option {
+          color: rgba(0, 0, 0, 0.87);
+          &.ng-option-marked {
+            background: rgba(0, 0, 0, 0.04);
+          }
+          &.ng-option-selected {
+            background: rgba(0, 0, 0, 0.12);
+            color: #3f51b5;
+          }
+        }
+        .ng-optgroup {
+          color: black;
+        }
+      }
+    }
+    .mat-form-field-appearance-outline {
+      .ng-select {
+        top: -4px;
+        .ng-dropdown-panel.ng-select-bottom {
+          top: calc(100% + 1.25em )
+        }
+        .ng-dropdown-panel.ng-select-top {
+          bottom: calc(100% + 1.45em )
+        }
+      }
+      .mat-form-field-prefix {
+        bottom: 0;
+        padding-top: 24px;
+      }
+    }
+  }
+}
