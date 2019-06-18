@@ -8,7 +8,7 @@ import {
   faSearch,
   faDotCircle,
   faEllipsisVAlt, faEllipsisH, faEllipsisV, faTimesCircle, faTimes
-} from '@fortawesome/pro-light-svg-icons';
+} from '../vendor/pro-light-svg-icons';
 
 @NgModule({
   exports: [
