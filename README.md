@@ -2,6 +2,14 @@
 
 This is [Proximi.io](https://proximi.io/) wayfinding client application powered with Angular 8.
 
+As first step please run
+
+```
+npm install
+```
+
+to install all dependencies, this is required only for the first time after cloning this source.
+
 ## Running production environment & settings
 
 As first it's required to fill the `token` variable in `settings.js` file with yours proximi.io master token. Without it, application would not be able to log in.

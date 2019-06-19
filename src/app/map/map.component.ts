@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
 import { MapService } from './map.service';
 import { SidebarService } from '../core/sidebar/sidebar.service';
-import { DomSanitizer } from '@angular/platform-browser';
 import { ResizedEvent } from 'angular-resize-event';
 import along from '@turf/along';
 import { AuthService } from '../auth/auth.service';
@@ -28,6 +27,7 @@ export class MapComponent implements OnInit, OnDestroy {
   config;
   currentUserData;
   selectedFloor;
+  selectedPlace;
   amenities = [];
   amenityMap = {};
   amenityLinks = {};
@@ -42,11 +42,11 @@ export class MapComponent implements OnInit, OnDestroy {
     features: []
   };
   floors = [];
+  places = [];
   showGeoJSON = true;
-  showRaster = false;
+  showRaster = true;
   showPOI = true;
   bottomLayer = Constants.default.DEFAULT_BOTTOM_LAYER;
-  lastFloorLayer = this.bottomLayer;
   routingStartImage = null;
   routingFinishImage = null;
   iconSize = 0.5;
@@ -86,12 +86,15 @@ export class MapComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.getCurrentUser();
     this.config = this.authService.getCurrentUserConfig();
     this.currentUserData = this.authService.getCurrentUserData();
+    this.places = this.currentUserData.places;
     this.floors = this.currentUserData.floors;
     this.features = this.currentUserData.features;
     this.filteredFeatures = [...this.features.features];
     this.amenities = this.currentUserData.amenities;
     this.level = this.config.default_floor_number ? this.config.default_floor_number : 0;
-    this.setFloor(this.floors.filter(floor => floor.level === this.level)[0]);
+    this.setFloor(this.currentUserData.defaultFloor);
+    this.selectedPlace = this.currentUserData.defaultPlace;
+    this.showRaster = this.config.show_floorplans ? this.config.show_floorplans : true;
 
     this.amenityMap = this.amenities.reduce((acc, item) => {
       if (item.icon && item.icon.match(/data:image/)) {
@@ -115,7 +118,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.config.point_of_origin.lat &&
       this.config.point_of_origin.lng ?
         [this.config.point_of_origin.lng, this.config.point_of_origin.lat] :
-        [0, 0];
+        this.selectedPlace ? [this.selectedPlace.location.lng, this.selectedPlace.location.lat] : [0, 0];
     this.mapCenter = center;
     this.mapStyle = this.styleURL;
     if (!this.mapMovingMethod) {
@@ -130,9 +133,6 @@ export class MapComponent implements OnInit, OnDestroy {
           this.centerizeMap(res.location, res.zoom);
         }
       }),
-      this.mapService.floorplansListener.subscribe(floors => {
-        this.initFloorplans(floors);
-      }),
       this.sidebarService.getStartPointListener().subscribe(poi => {
         this.startPoi = poi;
         this.generateRoute();
@@ -140,6 +140,9 @@ export class MapComponent implements OnInit, OnDestroy {
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
         this.generateRoute();
+      }),
+      this.sidebarService.getSelectedPlaceListener().subscribe(place => {
+        this.setPlace(place);
       })
     );
   }
@@ -214,23 +217,68 @@ export class MapComponent implements OnInit, OnDestroy {
     let floor;
     if (way === 'up') {
       floor =
-        this.floors.findIndex(f => f.level === this.level + 1) !== -1 ?
-        this.floors.filter(f => f.level === this.level + 1)[0] :
+        this.floors.findIndex(f => f.level === this.level + 1 && f.place_id === this.selectedPlace.id) !== -1 ?
+        this.floors.filter(f => f.level === this.level + 1 && f.place_id === this.selectedPlace.id)[0] :
         this.selectedFloor;
     } else {
       floor =
-        this.floors.findIndex(f => f.level === this.level - 1) !== -1 ?
-        this.floors.filter(f => f.level === this.level - 1)[0] :
+        this.floors.findIndex(f => f.level === this.level - 1 && f.place_id === this.selectedPlace.id) !== -1 ?
+        this.floors.filter(f => f.level === this.level - 1 && f.place_id === this.selectedPlace.id)[0] :
         this.selectedFloor;
     }
     this.setFloor(floor);
   }
 
+  setPlace(place) {
+    this.selectedPlace = place;
+    this.mapCenter = [this.selectedPlace.location.lng, this.selectedPlace.location.lat];
+    const floor = this.floors.filter(f => f.place_id === this.selectedPlace.id)[0];
+    if (floor) {
+      this.setFloor(floor);
+    }
+  }
+
   setFloor(floor) {
     this.level = floor.level;
     this.selectedFloor = floor;
+    this.generateFloorplanSource();
     this.generateRoutingSource();
     this.updateImages();
+  }
+
+  generateFloorplanSource() {
+    if (this.floorplans.findIndex(f => f.source.id === `${Constants.default.SOURCE_RASTER_FLOORPLAN}-${this.selectedFloor.id}`) === -1 ) {
+      this.floorplans = [];
+      if (
+        this.selectedFloor.level === this.level &&
+        (Array.isArray(this.selectedFloor.anchors) && this.selectedFloor.anchors.length === 4) &&
+        this.selectedFloor.floorplan_image_url != null && this.selectedFloor.floorplan_image_url.length > 0
+      ) {
+        const source = {
+          id: `${Constants.default.SOURCE_RASTER_FLOORPLAN}-${this.selectedFloor.id}`,
+          url: `https://api.proximi.fi/imageproxy?source=${this.selectedFloor.floorplan_image_url}`,
+          coordinates: this.selectedFloor.editor ?
+            this.selectedFloor.editor.coordinates :
+            [
+              [this.selectedFloor.anchors[0].lng, this.selectedFloor.anchors[0].lat],
+              [this.selectedFloor.anchors[1].lng, this.selectedFloor.anchors[1].lat],
+              [this.selectedFloor.anchors[3].lng, this.selectedFloor.anchors[3].lat],
+              [this.selectedFloor.anchors[2].lng, this.selectedFloor.anchors[2].lat]
+            ]
+        };
+        const layer = {
+          title: this.selectedFloor.name,
+          id: `${Constants.default.LAYER_RASTER_FLOORPLAN}-${this.selectedFloor.id}`,
+          layout: {
+            'visibility': this.showRaster ? 'visible' : 'none'
+          },
+          paint: {
+            'raster-opacity': 1
+          }
+        };
+        this.floorplans.push({source: source, layer: layer});
+      }
+    }
   }
 
   generateRoute() {
@@ -368,50 +416,6 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.mapZoom[0] === 0 && zoom) {
       this.mapZoom = [zoom];
     }
-  }
-
-  private initFloorplans(floors: any[]) {
-    this.floorplans = [];
-    for (const floor of floors) {
-      if (floor.anchors) {
-        const source = {
-          id: `${floor.id}-source`,
-          url: floor.floorplan_image_url ?
-            `https://api.proximi.fi/imageproxy?source=${floor.floorplan_image_url}` :
-            'https://api.proximi.fi/imageproxy?source=https://proximi.io/platform_assets/img/no_floorplan_placeholder.png',
-          coordinates: floor.editor ?
-            floor.editor.coordinates :
-            [
-              [floor.anchors[0].lng, floor.anchors[0].lat],
-              [floor.anchors[1].lng, floor.anchors[1].lat],
-              [floor.anchors[3].lng, floor.anchors[3].lat],
-              [floor.anchors[2].lng, floor.anchors[2].lat]
-            ]
-        };
-        const layer = {
-          title: floor.name,
-          id: `${floor.id}-layer`,
-          layout: {
-            'visibility': 'visible'
-          },
-          paint: {
-            'raster-opacity': 0.8
-          }
-        };
-        this.floorplans.push({source: source, layer: layer});
-      }
-    }
-  }
-
-  onToggleFloorplanVisibility(floorplan, toggleAll) {
-    this.floorplans = this.floorplans.map(item => {
-      if (!toggleAll && item.layer.id === floorplan.layer.id) {
-        item.layer.layout = {...item.layer.layout, 'visibility': floorplan.layer.layout.visibility === 'visible' ? 'none' : 'visible'};
-      } else if (toggleAll) {
-        item.layer.layout = {...item.layer.layout, 'visibility': toggleAll.selected ? 'visible' : 'none'};
-      }
-      return item;
-    });
   }
 
   ngOnDestroy(): void {

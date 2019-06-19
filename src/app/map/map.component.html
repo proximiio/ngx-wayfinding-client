@@ -48,7 +48,6 @@
     <mgl-layer
       type="fill"
       [id]="Constants.LAYER_FLOORS"
-      [before]="showRaster ? lastFloorLayer : null"
       [source]="Constants.SOURCE_GEOJSON_FLOORPLAN"
       [minzoom]="12"
       [maxzoom]="24"
@@ -412,5 +411,23 @@
           'visibility': !ignoreRoute ? 'visible' : 'none'
         }"
     ></mgl-layer>
+    <div *ngIf="floorplans.length > 0">
+      <ng-container *ngFor="let floorplan of floorplans">
+        <mgl-image-source
+          [id]="floorplan.source.id"
+          [url]="floorplan.source.url"
+          [coordinates]="floorplan.source.coordinates"
+        ></mgl-image-source>
+        <mgl-layer
+          [id]="floorplan.layer.id"
+          [source]="floorplan.source.id"
+          type="raster"
+          [minzoom]="12"
+          [before]="Constants.LAYER_FLOORS"
+          [paint]="floorplan.layer.paint"
+          [layout]="floorplan.layer.layout"
+        ></mgl-layer>
+      </ng-container>
+    </div>
   </mgl-map>
 </div>

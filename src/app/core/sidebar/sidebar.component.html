@@ -5,6 +5,11 @@
   <div class="brand">
     <img [src]="config.logo ? config.logo : 'assets/proximiio-logo-vertical.png'">
   </div>
+  <mat-form-field appearance="outline" *ngIf="showPlaceSelector">
+    <mat-label>{{ placeSelectorLabel }}</mat-label>
+    <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace"></ng-select>
+    <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
+  </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>{{ endPointLabel }}</mat-label>
     <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)">
@@ -14,7 +19,7 @@
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
         {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span>L<small>{{ item.level }}</small></span>
+        <span class="level">L<small>{{ item.level }}</small></span>
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'search']" transform="up-3"></fa-icon></span>
@@ -28,7 +33,7 @@
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
         {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span>L<small>{{ item.level }}</small></span>
+        <span class="level">L<small>{{ item.level }}</small></span>
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>

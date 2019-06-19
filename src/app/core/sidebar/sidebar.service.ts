@@ -8,6 +8,7 @@ export class SidebarService {
   public sidebarStatus = new Subject<boolean>();
   public startPointListener = new Subject<any>();
   public endPointListener = new Subject<any>();
+  public selectedPlaceListener = new Subject<any>();
 
   constructor() {}
 
@@ -36,5 +37,9 @@ export class SidebarService {
 
   getEndPointListener() {
     return this.endPointListener.asObservable();
+  }
+
+  getSelectedPlaceListener() {
+    return this.selectedPlaceListener.asObservable();
   }
 }

@@ -31,6 +31,7 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
     const currentUser = await proximiApiInstance.get(`/core/current_user`);
     const config = await proximiApiInstance.get(`/config`);
     const floors = await proximiApiInstance.get(`/core/floors`);
+    const places = await proximiApiInstance.get(`/core/places`);
     const features = await proximiApiInstance.get(`/v4/geo/features`);
     const amenities = await proximiApiInstance.get(`/v4/geo/amenities`);
 
@@ -41,13 +42,20 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
       return feature;
     });
 
+    const defaultLevel = config.data.default_floor_number ? config.data.default_floor_number : 0;
+    const defaultFloor = floors.data.filter(floor => floor.level === defaultLevel)[0];
+    const defaultPlace = places.data.filter(place => place.id === defaultFloor.place_id)[0];
+
     response.send({
       user: currentUser.data,
       config: config.data,
       data: {
         floors: _.sortBy(floors.data, ['level']),
+        places: places.data,
         features: features.data,
-        amenities: amenities.data
+        amenities: amenities.data,
+        defaultFloor: defaultFloor,
+        defaultPlace: defaultPlace
       }
     });
   } catch (error) {
