@@ -38,6 +38,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoading = false;
         this.userIsAuthenticated = isAuthenticated;
         this.currentUserConfig =  this.authService.getCurrentUserConfig();
+        setTimeout(() => {
+          this.sidebarService.appDrawer = this.appDrawer;
+        }, 500);
       });
     this.breakpointObserver
       .observe([Breakpoints.XSmall, Breakpoints.Small])

@@ -239,11 +239,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   setFloor(floor) {
-    this.level = floor.level;
-    this.selectedFloor = floor;
-    this.generateFloorplanSource();
-    this.generateRoutingSource();
-    this.updateImages();
+    if (floor) {
+      this.level = floor.level;
+      this.selectedFloor = floor;
+      this.generateFloorplanSource();
+      this.generateRoutingSource();
+      this.updateImages();
+    }
   }
 
   generateFloorplanSource() {
