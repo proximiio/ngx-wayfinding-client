@@ -5,19 +5,19 @@
   <div class="map-floors">
     <ul>
       <li>
-        <span *ngIf="endPoi && level !== endPoi.level && level < endPoi.level">{{ endPoi.level }}</span>
+        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'up'">{{ currentLevelChanger.nextLevel }}</span>
         <a href="javascript:;"
-           [ngClass]="{'blinking': endPoi && level !== endPoi.level && level < endPoi.level}"
-           (click)="onFloorChange('up')">
+           [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'up'}"
+           (click)="onFloorChange('up', currentLevelChanger)">
           <fa-icon [icon]="['fal', 'chevron-up']"></fa-icon>
         </a>
       </li>
       <li class="current-floor">{{ selectedFloor ? selectedFloor.level : 0 }}</li>
       <li>
-        <span *ngIf="endPoi && level !== endPoi.level && level > endPoi.level">{{ endPoi.level }}</span>
+        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'down'">{{ currentLevelChanger.nextLevel }}</span>
         <a href="javascript:;"
-           [ngClass]="{'blinking': endPoi && level !== endPoi.level && level > endPoi.level}"
-           (click)="onFloorChange('down')">
+           [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'down'}"
+           (click)="onFloorChange('down', currentLevelChanger)">
           <fa-icon [icon]="['fal', 'chevron-down']"></fa-icon>
         </a>
       </li>
@@ -368,7 +368,7 @@
       [layout]="{
           'icon-image': '{icon}',
           'icon-size': 0.3,
-          'icon-offset': way === 'up' ? [4, -80] : [4, 70],
+          'icon-offset': currentLevelChanger && currentLevelChanger.way === 'up' ? [4, -80] : [4, 70],
           'symbol-placement': 'point',
           'icon-allow-overlap': true,
           'text-allow-overlap': false,

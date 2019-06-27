@@ -74,7 +74,7 @@ export class MapComponent implements OnInit, OnDestroy {
   startPoi;
   endPoi;
   ignoreRoute = false;
-  way = null;
+  currentLevelChanger = null;
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -213,19 +213,16 @@ export class MapComponent implements OnInit, OnDestroy {
     return this.featureCache[cacheKey];
   }
 
-  onFloorChange(way) {
+  onFloorChange(way, currentLevelChanger) {
     let floor;
-    if (way === 'up') {
-      floor =
-        this.floors.findIndex(f => f.level === this.level + 1 && f.place_id === this.selectedPlace.id) !== -1 ?
-        this.floors.filter(f => f.level === this.level + 1 && f.place_id === this.selectedPlace.id)[0] :
-        this.selectedFloor;
-    } else {
-      floor =
-        this.floors.findIndex(f => f.level === this.level - 1 && f.place_id === this.selectedPlace.id) !== -1 ?
-        this.floors.filter(f => f.level === this.level - 1 && f.place_id === this.selectedPlace.id)[0] :
-        this.selectedFloor;
+    let nextLevel = way === 'up' ? this.level + 1 : this.level - 1;
+    if (currentLevelChanger && currentLevelChanger.way === way) {
+      nextLevel = currentLevelChanger.nextLevel;
     }
+    floor =
+      this.floors.findIndex(f => f.level === nextLevel && f.place_id === this.selectedPlace.id) !== -1 ?
+        this.floors.filter(f => f.level === nextLevel && f.place_id === this.selectedPlace.id)[0] :
+        this.selectedFloor;
     this.setFloor(floor);
   }
 
@@ -300,14 +297,24 @@ export class MapComponent implements OnInit, OnDestroy {
 
   generateRoutingSource() {
     this.ignoreRoute = false;
-    this.way = null;
+    this.currentLevelChanger = null;
     let path = null;
 
     if (!this.route) {
       this.ignoreRoute = true;
     } else if (this.route.levelPaths) {
+      const levelChanges = this.route.steps.filter(step => step.levelChange)
+        .map(step => {
+          const s = {
+            currentLevel: step.point[2],
+            nextLevel: step.nextPoint[2],
+            way: step.point[2] > step.nextPoint[2] ? 'down' : 'up'
+          };
+          return s;
+        });
+      this.currentLevelChanger = levelChanges.filter(change => change.currentLevel === this.level)[0];
       path = this.singleLevel ? this.route.linestring.path : this.route.levelPaths[this.level];
-      this.way = this.level === this.endPoi.level ? null : this.level < this.endPoi.level ? 'up' : 'down';
+      console.log(this.route);
     }
 
     if (!path) {
@@ -347,17 +354,17 @@ export class MapComponent implements OnInit, OnDestroy {
         ]
       };
 
-      if (this.way) {
+      if (this.currentLevelChanger) {
         this.routeCollection.features.push({
           type: 'Feature',
-          id: this.way === 'up' ? Constants.default.FEATURE_FLOORCHANGE_UP : Constants.default.FEATURE_FLOORCHANGE_DOWN,
+          id: this.currentLevelChanger.way === 'up' ? Constants.default.FEATURE_FLOORCHANGE_UP : Constants.default.FEATURE_FLOORCHANGE_DOWN,
           geometry: {
             type: 'Point',
             coordinates: path.geometry.coordinates[path.geometry.coordinates.length - 1]
           },
           properties: {
             usecase: 'floor-change-symbol',
-            icon: this.way === 'up' ? Constants.default.IMAGE_FLOORCHANGE_UP : Constants.default.IMAGE_FLOORCHANGE_DOWN
+            icon: this.currentLevelChanger.way === 'up' ? Constants.default.IMAGE_FLOORCHANGE_UP : Constants.default.IMAGE_FLOORCHANGE_DOWN
           }
         });
       }
