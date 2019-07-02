@@ -135,10 +135,18 @@ export class MapComponent implements OnInit, OnDestroy {
       }),
       this.sidebarService.getStartPointListener().subscribe(poi => {
         this.startPoi = poi;
+        if (poi && !this.endPoi) {
+          this.mapCenter = poi.coordinates;
+          this.mapZoom = [21];
+        }
         this.generateRoute();
       }),
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
+        if (poi && !this.startPoi) {
+          this.mapCenter = poi.coordinates;
+          this.mapZoom = [21];
+        }
         this.generateRoute();
       }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
@@ -314,7 +322,6 @@ export class MapComponent implements OnInit, OnDestroy {
         });
       this.currentLevelChanger = levelChanges.filter(change => change.currentLevel === this.level)[0];
       path = this.singleLevel ? this.route.linestring.path : this.route.levelPaths[this.level];
-      console.log(this.route);
     }
 
     if (!path) {
