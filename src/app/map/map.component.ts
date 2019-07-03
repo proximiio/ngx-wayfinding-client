@@ -136,16 +136,14 @@ export class MapComponent implements OnInit, OnDestroy {
       this.sidebarService.getStartPointListener().subscribe(poi => {
         this.startPoi = poi;
         if (poi && !this.endPoi) {
-          this.mapCenter = poi.coordinates;
-          this.mapZoom = [21];
+          this.centerOnPoi(poi);
         }
         this.generateRoute();
       }),
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
         if (poi && !this.startPoi) {
-          this.mapCenter = poi.coordinates;
-          this.mapZoom = [21];
+          this.centerOnPoi(poi);
         }
         this.generateRoute();
       }),
@@ -153,6 +151,13 @@ export class MapComponent implements OnInit, OnDestroy {
         this.setPlace(place);
       })
     );
+  }
+
+  centerOnPoi(poi) {
+    const floor = this.floors.filter(f => f.level === poi.level && f.place_id === this.selectedPlace.id)[0];
+    this.mapCenter = poi.coordinates;
+    this.mapZoom = [21];
+    this.setFloor(floor);
   }
 
   onResized(event: ResizedEvent) {
