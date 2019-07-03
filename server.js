@@ -1,10 +1,10 @@
-var http = require('http');
-var express = require('express');
-var app = express();
-var Settings = require('./settings');
-var httpPort = process.env.PORT || Settings.port;
-var bodyParser = require('body-parser');
-var cors = require('cors');
+const http = require('http');
+const express = require('express');
+const app = express();
+const Settings = require('./settings');
+const httpPort = process.env.PORT || Settings.port;
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const axios = require('axios');
 const _ = require('lodash');
 const path = require('path');
@@ -67,7 +67,7 @@ app.get(Settings.basepath+'/*',(req,res) =>{
   res.sendFile(path.join(__dirname,'dist/ngx-wayfinding-client/index.html'));
 });
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 server.listen(httpPort, '127.0.0.1', () => {
   console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}${Settings.basepath} **`)
 });

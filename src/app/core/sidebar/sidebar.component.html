@@ -7,12 +7,12 @@
   </div>
   <mat-form-field appearance="outline" *ngIf="showPlaceSelector">
     <mat-label>{{ placeSelectorLabel }}</mat-label>
-    <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace"></ng-select>
+    <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace" ></ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>{{ endPointLabel }}</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)">
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>
@@ -26,7 +26,7 @@
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>{{ startPointLabel }}</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)">
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>
