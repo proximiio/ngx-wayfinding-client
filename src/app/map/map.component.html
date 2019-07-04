@@ -305,6 +305,7 @@
           'text-allow-overlap': true,
           'visibility': showPOI ? 'visible' : 'none'
         }"
+      (click)="onPoiClick($event)"
     ></mgl-layer>
     <mgl-layer
       type="symbol"
@@ -410,6 +411,74 @@
       [layout]="{
           'visibility': !ignoreRoute ? 'visible' : 'none'
         }"
+    ></mgl-layer>
+    <mgl-geojson-source
+      [id]="Constants.SOURCE_HIGHLIGHT_POINTS"
+      [data]="highlightPointsCollection"
+      [maxzoom]="24"
+    ></mgl-geojson-source>
+    <mgl-layer
+      *ngIf="highlightClickedPoi"
+      type="circle"
+      [id]="Constants.LAYER_HIGHLIGHT_CLICKED_POINT"
+      [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
+      [minzoom]="17"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'clicked-point-highlight'],
+            ['==', ['to-number', ['get', 'level']], level]
+          ]
+        "
+      [paint]="{
+        'circle-radius': 38,
+        'circle-blur': 0.5,
+        'circle-color': '#3887be'
+      }"
+      [before]="Constants.LAYER_POIS_ICONS"
+    ></mgl-layer>
+    <mgl-layer
+      *ngIf="highlightSelectedPoi"
+      type="circle"
+      [id]="Constants.LAYER_HIGHLIGHT_STARTPOI_POINT"
+      [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
+      [minzoom]="17"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'startpoi-point-highlight'],
+            ['==', ['to-number', ['get', 'level']], level]
+          ]
+        "
+      [paint]="{
+        'circle-radius': 38,
+        'circle-blur': 0.5,
+        'circle-color': '#40dc7e'
+      }"
+      [before]="Constants.LAYER_POIS_ICONS"
+    ></mgl-layer>
+    <mgl-layer
+      *ngIf="highlightSelectedPoi"
+      type="circle"
+      [id]="Constants.LAYER_HIGHLIGHT_ENDPOI_POINT"
+      [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
+      [minzoom]="17"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'endpoi-point-highlight'],
+            ['==', ['to-number', ['get', 'level']], level]
+          ]
+        "
+      [paint]="{
+        'circle-radius': 38,
+        'circle-blur': 0.5,
+        'circle-color': '#8a7fff'
+      }"
+      [before]="Constants.LAYER_POIS_ICONS"
     ></mgl-layer>
     <div *ngIf="floorplans.length > 0">
       <ng-container *ngFor="let floorplan of floorplans">

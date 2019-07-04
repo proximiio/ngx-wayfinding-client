@@ -117,7 +117,7 @@ export class AuthService {
     const data = this.sessionStorageService.getItem(
       AUTH_KEY
     );
-    if (!data || !data.token || !data.user || !data.config || !data.data) {
+    if (!data || !data.token || !data.user || !data.data) {
       return;
     }
     return data;

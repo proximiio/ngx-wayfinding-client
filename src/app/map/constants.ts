@@ -41,5 +41,11 @@ export default {
 
   GEOJSON_POLYGON: 'Polygon',
   GEOJSON_POINT: 'Point',
-  GEOJSON_LINESTRING: 'LineString'
+  GEOJSON_LINESTRING: 'LineString',
+
+  SOURCE_HIGHLIGHT_POINTS: 'highlight-points-source',
+  LAYER_HIGHLIGHT_CLICKED_POINT: 'highlight-clicked-point-layer',
+  LAYER_HIGHLIGHT_STARTPOI_POINT: 'highlight-startpoi-point-layer',
+  LAYER_HIGHLIGHT_ENDPOI_POINT: 'highlight-endpoi-point-layer',
+  FEATURE_HIGHLIGHT_POINT: 'highlight-point-feature'
 };

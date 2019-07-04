@@ -5,6 +5,7 @@ import { ResizedEvent } from 'angular-resize-event';
 import along from '@turf/along';
 import { AuthService } from '../auth/auth.service';
 import * as Constants from './constants';
+import { MapLayerMouseEvent } from 'mapbox-gl';
 
 const GEO_API_ROOT = 'https://api.proximi.fi/v4/geo';
 
@@ -75,6 +76,12 @@ export class MapComponent implements OnInit, OnDestroy {
   endPoi;
   ignoreRoute = false;
   currentLevelChanger = null;
+  highlightClickedPoi = true;
+  highlightSelectedPoi = true;
+  highlightPointsCollection = {
+    type: 'FeatureCollection',
+    features: []
+  };
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -135,16 +142,20 @@ export class MapComponent implements OnInit, OnDestroy {
       }),
       this.sidebarService.getStartPointListener().subscribe(poi => {
         this.startPoi = poi;
+        const feature = poi ? this.filteredFeatures.filter(f => f.properties.id === poi.id)[0] : null;
         if (poi && !this.endPoi) {
           this.centerOnPoi(poi);
         }
+        this.generateHighlightSource(feature, 'startPoi');
         this.generateRoute();
       }),
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
+        const feature = poi ? this.filteredFeatures.filter(f => f.properties.id === poi.id)[0] : null;
         if (poi && !this.startPoi) {
           this.centerOnPoi(poi);
         }
+        this.generateHighlightSource(feature, 'endPoi');
         this.generateRoute();
       }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
@@ -413,6 +424,58 @@ export class MapComponent implements OnInit, OnDestroy {
   cancelRoute() {
     this.route = null;
     this.generateRoutingSource();
+  }
+
+  onPoiClick(evt: MapLayerMouseEvent) {
+    const feature = this.filteredFeatures.filter(f => f.properties.id === evt.features[0].properties.id)[0];
+    if (feature) {
+      this.generateHighlightSource(feature, 'click');
+    }
+  }
+
+  generateHighlightSource(feature, type) {
+    if (feature) {
+      const newHighlight: any = {
+        type: 'Feature',
+        id: `Constants.default.FEATURE_HIGHLIGHT_POINT-${feature.id}`,
+        geometry: {
+          type: 'Point',
+          coordinates: feature.geometry.coordinates
+        },
+        properties: {
+          level: feature.properties.level
+        }
+      };
+      let previousClickHighlight = null;
+
+      if (type === 'click') {
+        newHighlight.properties.usecase = 'clicked-point-highlight';
+        previousClickHighlight = this.highlightPointsCollection.features.filter(f => f.id === newHighlight.id && f.properties.usecase === 'clicked-point-highlight')[0];
+      } else if (type === 'startPoi') {
+        newHighlight.properties.usecase = 'startpoi-point-highlight';
+      } else if (type === 'endPoi') {
+        newHighlight.properties.usecase = 'endpoi-point-highlight';
+      }
+
+      if (this.highlightPointsCollection.features.length > 0) {
+        // remove previous highlight instance with same usecase if exists
+        this.highlightPointsCollection.features = this.highlightPointsCollection.features.filter(f => f.properties.usecase !== newHighlight.properties.usecase);
+      }
+
+      // only add new feature if the previous one was not the clicked usecase and it's not the same otherwise keep it removed
+      if (!previousClickHighlight) {
+        this.highlightPointsCollection.features.push(newHighlight);
+      }
+    } else {
+      // remove highlight after poi unselect
+      if (type === 'startPoi') {
+        this.highlightPointsCollection.features = this.highlightPointsCollection.features.filter(f => f.properties.usecase !== 'startpoi-point-highlight');
+      } else if (type === 'endPoi') {
+        this.highlightPointsCollection.features = this.highlightPointsCollection.features.filter(f => f.properties.usecase !== 'endpoi-point-highlight');
+      }
+    }
+
+    this.highlightPointsCollection = {...this.highlightPointsCollection};
   }
 
   onLoad(map) {
