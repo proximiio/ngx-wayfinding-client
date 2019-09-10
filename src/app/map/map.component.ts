@@ -413,7 +413,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
 
       this.mapCenter = path.geometry.coordinates[0];
-      this.mapZoom = [19];
+      this.mapZoom = [21];
 
       if (this.sidebarService.sidenavMode === 'over') {
         this.sidebarService.closeSidebar();
