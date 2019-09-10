@@ -483,7 +483,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.mapLoaded.emit(true);
     this.map.resize();
     this.isLoaded = true;
-    this.mapZoom = [17];
+    this.mapZoom = [20];
     this.subs.push(
       this.sidebarService.getSidebarStatusListener().subscribe(() => {
         if (this.map) {

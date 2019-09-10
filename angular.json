@@ -23,7 +23,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": false,
-            "baseHref": "/wayfinding/",
+            "baseHref": "/k-rauta/",
             "assets": [
               "src/favicon.ico",
               "src/assets"
