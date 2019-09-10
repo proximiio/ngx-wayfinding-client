@@ -19,6 +19,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   theme$ = 'default-theme';
   currentUserConfig;
+  sendAnalytics = false;
   private authListenerSubs: Subscription;
 
   constructor(
@@ -29,10 +30,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     overlayContainer: OverlayContainer
   ) {
     overlayContainer.getContainerElement().classList.add(this.theme$);
-    Fingerprint2.get((fingerprint) => {
+    /*Fingerprint2.get((fingerprint) => {
       console.log(fingerprint);
     });
-    this.ahoyService.getInstance().debug();
+    this.ahoyService.getInstance().debug();*/
   }
 
   ngOnInit(): void {
@@ -73,7 +74,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startAhoyTracking() {
-    this.ahoyService.getInstance().trackAll();
+    if (this.sendAnalytics) {
+      this.ahoyService.getInstance().trackAll();
+    }
   }
 
   ngAfterViewInit(): void {
