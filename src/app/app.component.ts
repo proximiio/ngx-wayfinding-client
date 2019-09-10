@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { SidebarService } from './core/sidebar/sidebar.service';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import Fingerprint2 from 'fingerprintjs2';
+import { AhoyService } from './core/ahoy.service';
 
 @Component({
   selector: 'app-root',
@@ -23,9 +25,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     public sidebarService: SidebarService,
     private authService: AuthService,
     private breakpointObserver: BreakpointObserver,
+    private ahoyService: AhoyService,
     overlayContainer: OverlayContainer
   ) {
     overlayContainer.getContainerElement().classList.add(this.theme$);
+    Fingerprint2.get((fingerprint) => {
+      console.log(fingerprint);
+    });
+    this.ahoyService.getInstance().debug();
   }
 
   ngOnInit(): void {
@@ -40,6 +47,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentUserConfig =  this.authService.getCurrentUserConfig();
         setTimeout(() => {
           this.sidebarService.appDrawer = this.appDrawer;
+          this.startAhoyTracking();
         }, 500);
       });
     this.breakpointObserver
@@ -60,7 +68,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.authService.login();
     } else {
       this.currentUserConfig =  this.authService.getCurrentUserConfig();
+      this.startAhoyTracking();
     }
+  }
+
+  startAhoyTracking() {
+    this.ahoyService.getInstance().trackAll();
   }
 
   ngAfterViewInit(): void {
