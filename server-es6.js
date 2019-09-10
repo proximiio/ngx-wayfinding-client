@@ -1,15 +1,13 @@
-var http = require('http');
-var express = require('express');
-var app = express();
-var Settings = require('./settings');
-var httpPort = process.env.PORT || Settings.port;
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var axios = require('axios');
-var _ = require('lodash');
-var path = require('path');
-var async = require('asyncawait/async');
-var await = require('asyncawait/await');
+const http = require('http');
+const express = require('express');
+const app = express();
+const Settings = require('./settings');
+const httpPort = process.env.PORT || Settings.port;
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const axios = require('axios');
+const _ = require('lodash');
+const path = require('path');
 
 const proximiApiInstance = axios.create({
   baseURL: Settings.proximi_api
@@ -28,14 +26,14 @@ app.get(Settings.basepath+'/token', function(request, response) {
   response.send(Settings.token);
 });
 
-app.get(Settings.basepath+'/auth', async (function(request, response, next) {
+app.get(Settings.basepath+'/auth', async (request, response, next) => {
   try {
-    const currentUser = await (proximiApiInstance.get(`/core/current_user`));
-    const config = await (proximiApiInstance.get(`/config`));
-    const floors = await (proximiApiInstance.get(`/core/floors`));
-    const places = await (proximiApiInstance.get(`/core/places`));
-    const features = await (proximiApiInstance.get(`/v4/geo/features`));
-    const amenities = await (proximiApiInstance.get(`/v4/geo/amenities`));
+    const currentUser = await proximiApiInstance.get(`/core/current_user`);
+    const config = await proximiApiInstance.get(`/config`);
+    const floors = await proximiApiInstance.get(`/core/floors`);
+    const places = await proximiApiInstance.get(`/core/places`);
+    const features = await proximiApiInstance.get(`/v4/geo/features`);
+    const amenities = await proximiApiInstance.get(`/v4/geo/amenities`);
 
     features.data.features = features.data.features.map(feature => {
       if (!feature.properties.title) {
@@ -63,13 +61,13 @@ app.get(Settings.basepath+'/auth', async (function(request, response, next) {
   } catch (error) {
     next(error);
   }
-}));
+});
 
-app.get(Settings.basepath+'/*', function(req,res) {
+app.get(Settings.basepath+'/*',(req,res) =>{
   res.sendFile(path.join(__dirname,'dist/ngx-wayfinding-client/index.html'));
 });
 
 const server = http.createServer(app);
-server.listen(httpPort, '127.0.0.1', function() {
+server.listen(httpPort, '127.0.0.1', () => {
   console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}${Settings.basepath} **`)
 });
