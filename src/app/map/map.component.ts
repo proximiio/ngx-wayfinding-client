@@ -82,6 +82,7 @@ export class MapComponent implements OnInit, OnDestroy {
     type: 'FeatureCollection',
     features: []
   };
+  accessibleOnly = false;
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -99,6 +100,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.filteredFeatures = [...this.features.features];
     this.amenities = this.currentUserData.amenities;
     this.level = this.config.default_floor_number ? this.config.default_floor_number : 0;
+    this.accessibleOnly = this.config.accessible_only ? this.config.accessible_only : false;
     this.setFloor(this.currentUserData.defaultFloor);
     this.selectedPlace = this.currentUserData.defaultPlace;
     this.showRaster = this.config.show_floorplans ? this.config.show_floorplans : true;
@@ -156,6 +158,10 @@ export class MapComponent implements OnInit, OnDestroy {
           this.centerOnPoi(poi);
         }
         this.generateHighlightSource(feature, 'endPoi');
+        this.generateRoute();
+      }),
+      this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
+        this.accessibleOnly = accessibleOnly;
         this.generateRoute();
       }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
@@ -306,7 +312,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   generateRoute() {
     if (this.startPoi && this.endPoi) {
-      this.mapService.getRoute(this.startPoi, this.endPoi, false, false, this.currentUser.token)
+      this.mapService.getRoute(this.startPoi, this.endPoi, this.accessibleOnly, false, this.currentUser.token)
         .subscribe(route => {
           const startFloor = this.floors.filter(f => f.level === this.startPoi.level)[0];
           this.route = route;

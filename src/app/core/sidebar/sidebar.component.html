@@ -38,5 +38,17 @@
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>
   </mat-form-field>
+  <div *ngIf="showOnlyAccessibleToggle">
+    <button type="button" class="accessible-btn" (click)="onAccessibleOnlyToggle()">
+      <fa-icon [icon]="['fal', 'wheelchair']" size="lg"></fa-icon>
+      <span>Accessible routes only</span>
+      <fa-icon [icon]="['fal', 'toggle-off']" *ngIf="!onlyAccessible" class="toggle-off" size="2x"></fa-icon>
+      <fa-icon [icon]="['fal', 'toggle-on']" *ngIf="onlyAccessible" class="toggle-on" size="2x"></fa-icon>
+    </button>
+  </div>
+  <div class="powered-by" *ngIf="showPoweredBy">
+    <img src="assets/proximiio-logo-only.png" alt="Proximi.io">
+    <h4 class="title">Powered by Proximi.io</h4>
+  </div>
 </div>
 

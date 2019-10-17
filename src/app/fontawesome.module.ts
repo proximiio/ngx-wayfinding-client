@@ -7,7 +7,7 @@ import {
   faChevronDown,
   faSearch,
   faDotCircle,
-  faEllipsisVAlt, faEllipsisH, faEllipsisV, faTimesCircle, faTimes, faSearchLocation, faMapMarkerAlt
+  faEllipsisVAlt, faEllipsisH, faEllipsisV, faTimesCircle, faTimes, faSearchLocation, faMapMarkerAlt, faWheelchair, faToggleOn, faToggleOff
 } from '../vendor/pro-light-svg-icons';
 
 @NgModule({
@@ -29,7 +29,10 @@ export class FontawesomeModule {
       faTimesCircle,
       faTimes,
       faSearchLocation,
-      faMapMarkerAlt
+      faMapMarkerAlt,
+      faWheelchair,
+      faToggleOff,
+      faToggleOn
     );
   }
 }
