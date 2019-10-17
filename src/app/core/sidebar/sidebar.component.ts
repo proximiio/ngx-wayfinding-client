@@ -25,6 +25,9 @@ export class SidebarComponent implements OnInit {
   placeSelectorLabel = 'Pick up a place';
   useCustomPois = false;
   customPois = [];
+  showOnlyAccessibleToggle = true;
+  onlyAccessible = false;
+  showPoweredBy = false;
 
   constructor(
     private authService: AuthService,
@@ -40,6 +43,7 @@ export class SidebarComponent implements OnInit {
     this.filteredFeatures = [...this.currentUserData.features.features];
     this.customPois = this.currentUserData.customPois ? this.currentUserData.customPois : [];
     this.amenities = this.currentUserData.amenities;
+    this.onlyAccessible = this.config.accessible_only ? this.config.accessible_only : false;
   }
 
   ngOnInit() {
@@ -110,6 +114,11 @@ export class SidebarComponent implements OnInit {
   onPlaceSelect(place) {
     this.pois = this.sortedPOIs;
     this.sidebarService.selectedPlaceListener.next(place);
+  }
+
+  onAccessibleOnlyToggle() {
+    this.onlyAccessible = !this.onlyAccessible;
+    this.sidebarService.accessibleOnlyToggleListener.next(this.onlyAccessible);
   }
 
 }

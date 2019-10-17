@@ -101,4 +101,44 @@
       }
     }
   }
+
+  .accessible-btn {
+    cursor: pointer;
+    background-color: #e7e7e7;
+    border: 0;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.1);
+    border-radius: 4px;
+    padding: .5rem;
+    text-align: left;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    &:hover {
+      background-color: #fff;
+    }
+    >span {
+      margin-left: 10px;
+      font-size: 13px;
+      line-height: 20px;
+    }
+    .toggle-off,
+    .toggle-on {
+      float: right;
+    }
+    .toggle-on {
+      color: #1cc54e;
+    }
+  }
+
+  .powered-by {
+    text-align: center;
+    margin-top: 2rem;
+    img {
+      width: 80px;
+    }
+    .title {
+      margin-top: 0;
+      color: #333;
+    }
+  }
 }
