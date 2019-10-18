@@ -339,45 +339,6 @@
     ></mgl-geojson-source>
     <mgl-layer
       type="symbol"
-      [id]="Constants.LAYER_ROUTING_SYMBOLS"
-      [source]="Constants.SOURCE_ROUTING"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'route-symbol'
-          ]
-        "
-      [layout]="{
-          'icon-image': '{icon}',
-          'icon-size': 0.4,
-          'symbol-placement': 'point',
-          'icon-allow-overlap': true,
-          'text-allow-overlap': false,
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="symbol"
-      [id]="Constants.LAYER_FLOORCHANGE_SYMBOLS"
-      [source]="Constants.SOURCE_ROUTING"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'floor-change-symbol'
-          ]
-        "
-      [layout]="{
-          'icon-image': '{icon}',
-          'icon-size': 0.3,
-          'icon-offset': currentLevelChanger && currentLevelChanger.way === 'up' ? [4, -80] : [4, 70],
-          'symbol-placement': 'point',
-          'icon-allow-overlap': true,
-          'text-allow-overlap': false,
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="symbol"
       [id]="Constants.LAYER_ROUTING_SYMBOLS + '_line'"
       [source]="Constants.SOURCE_ROUTING"
       [filter]="
@@ -409,6 +370,45 @@
         "
       [paint]="routeLineStyle"
       [layout]="{
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_ROUTING_SYMBOLS"
+      [source]="Constants.SOURCE_ROUTING"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'route-symbol'
+          ]
+        "
+      [layout]="{
+          'icon-image': '{icon}',
+          'icon-size': 0.4,
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'text-allow-overlap': false,
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_FLOORCHANGE_SYMBOLS"
+      [source]="Constants.SOURCE_ROUTING"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'floor-change-symbol'
+          ]
+        "
+      [layout]="{
+          'icon-image': '{icon}',
+          'icon-size': 0.3,
+          'icon-offset': currentLevelChanger && currentLevelChanger.way === 'up' ? [4, -80] : [4, 90],
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'text-allow-overlap': false,
           'visibility': !ignoreRoute ? 'visible' : 'none'
         }"
     ></mgl-layer>

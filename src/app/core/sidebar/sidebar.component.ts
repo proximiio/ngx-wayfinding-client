@@ -19,7 +19,7 @@ export class SidebarComponent implements OnInit {
   amenities;
   pois;
   selectedPlace;
-  showPlaceSelector = true;
+  showPlaceSelector = false;
   endPointLabel = 'What are you looking for?';
   startPointLabel = 'Where are you now?';
   placeSelectorLabel = 'Pick up a place';
@@ -27,7 +27,7 @@ export class SidebarComponent implements OnInit {
   customPois = [];
   showOnlyAccessibleToggle = true;
   onlyAccessible = false;
-  showPoweredBy = false;
+  showPoweredBy = true;
 
   constructor(
     private authService: AuthService,

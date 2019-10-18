@@ -132,13 +132,15 @@
 
   .powered-by {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 4rem;
     img {
       width: 80px;
     }
     .title {
       margin-top: 0;
       color: #333;
+      opacity: .7;
+      font-weight: 300;
     }
   }
 }
