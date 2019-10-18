@@ -48,6 +48,7 @@ export class MapComponent implements OnInit, OnDestroy {
   showRaster = true;
   showPOI = true;
   bottomLayer = Constants.default.DEFAULT_BOTTOM_LAYER;
+  lastFloorLayer = this.bottomLayer;
   routingStartImage = { uri: 'assets/start-point-icon.png' };
   routingContinueImage = { uri: 'assets/continue-point-icon.png' };
   routingFinishImage = { uri: 'assets/end-point-icon.png' };
@@ -188,8 +189,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
   get styleURL() {
     return this.currentUser.organization.name === 'Tawar Mall' ?
-      `${GEO_API_ROOT}/style?token=${this.currentUser.token}&expr=false&basic=true&skipfile=true` :
-      `${GEO_API_ROOT}/style?token=${this.currentUser.token}&expr=false&basic=true`;
+      `${GEO_API_ROOT}/style?token=${this.currentUser.token}&basic=true&skipfile=true` :
+      `${GEO_API_ROOT}/style?token=${this.currentUser.token}&basic=true`;
   }
 
   updateImages() {
@@ -205,7 +206,7 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     this.amenities
-      .filter(a => a.category === 'levelchangers')
+      .filter(a => a.icon)
       .forEach(amenity => {
         images[amenity.id] = { uri: amenity.icon };
       });
@@ -276,6 +277,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.generateFloorplanSource();
       this.generateRoutingSource();
       this.updateImages();
+      this.refreshLayers();
     }
   }
 
@@ -309,6 +311,7 @@ export class MapComponent implements OnInit, OnDestroy {
             'raster-opacity': 1
           }
         };
+        this.lastFloorLayer = layer.id;
         this.floorplans.push({source: source, layer: layer});
       }
     }
@@ -490,6 +493,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   onLoad(map) {
     this.map = map;
+    this.refreshLayers();
     this.mapLoaded.emit(true);
     this.map.resize();
     this.isLoaded = true;
@@ -503,6 +507,40 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  refreshLayers() {
+    if (this.map) {
+      this.map.getSource('main').setData(this.featuresForLevel(this.level, false));
+      const layers = this.map.getStyle().layers;
+      layers.forEach(l => {
+        const layer = this.map.getLayer(l.id);
+        if (layer && layer.filter) {
+          const filterArray = [...layer.filter];
+          let changed = false;
+          let expressions = false;
+          const levelProperties = ['level', 'level_min', 'level_max'];
+          filterArray.forEach(filter => {
+            if (Array.isArray(filter) && Array.isArray(filter[1]) && filter[1][0] === 'to-number' && levelProperties.includes(filter[1][1][1])) {
+              filter[2] = this.level;
+              changed = true;
+              expressions = true;
+            } else if (Array.isArray(filter) && levelProperties.includes(filter[1])) {
+              filter[2] = this.level;
+              changed = true;
+            }
+          });
+          if (expressions) {
+            filterArray.push(['!=', ['get', 'visibility'], 'none']);
+          } else {
+            filterArray.push(['!=', 'visibility', 'none']);
+          }
+          if (changed) {
+            this.map.setFilter(l.id, filterArray);
+          }
+        }
+      });
+    }
   }
 
   private centerizeMap(location, zoom) {
