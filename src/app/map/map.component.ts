@@ -52,6 +52,7 @@ export class MapComponent implements OnInit, OnDestroy {
   routingStartImage = { uri: 'assets/start-point-icon.png' };
   routingContinueImage = { uri: 'assets/continue-point-icon.png' };
   routingFinishImage = { uri: 'assets/end-point-icon.png' };
+  useCustomRoutingImages = true;
   iconSize = 0.5;
   imagesIteration = 0;
   images = {};
@@ -116,11 +117,8 @@ export class MapComponent implements OnInit, OnDestroy {
       return acc;
     }, {});
 
-    if (this.routingStartImage === null) {
+    if (!this.useCustomRoutingImages) {
       this.routingStartImage = this.amenityBaseLinks.route_start;
-    }
-
-    if (this.routingFinishImage === null) {
       this.routingFinishImage = this.amenityBaseLinks.route_finish;
     }
 
@@ -215,7 +213,7 @@ export class MapComponent implements OnInit, OnDestroy {
     images[Constants.default.IMAGE_FLOORCHANGE_UP] = { uri: 'assets/go-up-alt.png' };
     images[Constants.default.IMAGE_FLOORCHANGE_DOWN] = { uri: 'assets/go-down-alt.png' };
     images[Constants.default.IMAGE_ROUTING_START] = this.routingStartImage;
-    images[Constants.default.IMAGE_ROUTING_CONTINUE] = this.routingContinueImage;
+    images[Constants.default.IMAGE_ROUTING_CONTINUE] = this.useCustomRoutingImages ? this.routingContinueImage : this.routingFinishImage;
     images[Constants.default.IMAGE_ROUTING_FINISH] = this.routingFinishImage;
 
     this.images = images;

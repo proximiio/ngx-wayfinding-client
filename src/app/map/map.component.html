@@ -100,42 +100,6 @@
     ></mgl-geojson-source>
     <mgl-layer
       type="symbol"
-      [id]="Constants.LAYER_ROUTING_SYMBOLS + '_line'"
-      [source]="Constants.SOURCE_ROUTING"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'route-line-symbol'
-          ]
-        "
-      [layout]="{
-          'icon-image': 'bluedot',
-          'icon-size': 0.25,
-          'symbol-placement': 'point',
-          'icon-allow-overlap': false,
-          'text-allow-overlap': false,
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="line"
-      [id]="Constants.LAYER_ROUTING_LINE"
-      [source]="Constants.SOURCE_ROUTING"
-      [minzoom]="10"
-      [maxzoom]="24"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'route-line'
-          ]
-        "
-      [paint]="routeLineStyle"
-      [layout]="{
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="symbol"
       [id]="Constants.LAYER_ROUTING_SYMBOLS"
       [source]="Constants.SOURCE_ROUTING"
       [filter]="
@@ -170,6 +134,42 @@
           'symbol-placement': 'point',
           'icon-allow-overlap': true,
           'text-allow-overlap': false,
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_ROUTING_SYMBOLS + '_line'"
+      [source]="Constants.SOURCE_ROUTING"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'route-line-symbol'
+          ]
+        "
+      [layout]="{
+          'icon-image': 'bluedot',
+          'icon-size': 0.25,
+          'symbol-placement': 'point',
+          'icon-allow-overlap': false,
+          'text-allow-overlap': false,
+          'visibility': !ignoreRoute ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="line"
+      [id]="Constants.LAYER_ROUTING_LINE"
+      [source]="Constants.SOURCE_ROUTING"
+      [minzoom]="10"
+      [maxzoom]="24"
+      [filter]="
+          [
+            '==',
+            ['get', 'usecase'], 'route-line'
+          ]
+        "
+      [paint]="routeLineStyle"
+      [layout]="{
           'visibility': !ignoreRoute ? 'visible' : 'none'
         }"
     ></mgl-layer>
