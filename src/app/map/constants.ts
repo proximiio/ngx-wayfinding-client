@@ -33,6 +33,7 @@ export default {
   FEATURE_ROUTING_FINISH: 'proximiio-routing_finish-feature',
   IMAGE_USER_MARKER: 'proximiio-blue_dot-image',
   IMAGE_ROUTING_START: 'proximiio-routing_start-image',
+  IMAGE_ROUTING_CONTINUE: 'proximiio-routing_continue-image',
   IMAGE_ROUTING_FINISH: 'proximiio-routing_finish-image',
   FEATURE_FLOORCHANGE_UP: 'proximiio-floorchange-up-feature',
   FEATURE_FLOORCHANGE_DOWN: 'proximiio-floorchange-down-feature',
