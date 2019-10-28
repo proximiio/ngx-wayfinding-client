@@ -25,7 +25,7 @@ export class SidebarComponent implements OnInit {
   placeSelectorLabel = 'Pick up a place';
   useCustomPois = false;
   customPois = [];
-  showOnlyAccessibleToggle = true;
+  showOnlyAccessibleToggle = false;
   onlyAccessible = false;
   showPoweredBy = false;
 

@@ -52,7 +52,7 @@ export class MapComponent implements OnInit, OnDestroy {
   routingStartImage = { uri: 'assets/start-point-icon.png' };
   routingContinueImage = { uri: 'assets/continue-point-icon.png' };
   routingFinishImage = { uri: 'assets/end-point-icon.png' };
-  useCustomRoutingImages = false;
+  useCustomRoutingImages = true;
   iconSize = 0.5;
   imagesIteration = 0;
   images = {};
@@ -62,7 +62,7 @@ export class MapComponent implements OnInit, OnDestroy {
     'line-color': '#00ee00',
     'line-width': 12
   };
-  useDottedRouteLine = true;
+  useDottedRouteLine = false;
   singleLevel = false;
   showLevelChangers = true;
   Constants = Constants.default;
