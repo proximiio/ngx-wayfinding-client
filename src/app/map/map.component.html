@@ -12,7 +12,7 @@
           <fa-icon [icon]="['fal', 'chevron-up']"></fa-icon>
         </a>
       </li>
-      <li class="current-floor">{{ selectedFloor ? selectedFloor.level : 0 }}</li>
+      <li class="current-floor">{{ selectedFloor ? selectedFloor.name : 0 }}</li>
       <li>
         <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'down'">{{ currentLevelChanger.nextLevel }}</span>
         <a href="javascript:;"
@@ -54,7 +54,8 @@
           [
             'all',
             ['==', ['get', 'usecase'], 'poi'],
-            ['==', ['to-number', ['get', 'level']], level]
+            ['==', ['to-number', ['get', 'level']], level],
+            ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : amenityIds, true, false]
           ]
         "
       [layout]="{
@@ -78,7 +79,8 @@
           [
             'all',
             ['==', ['get', 'usecase'], 'poi'],
-            ['==', ['to-number', ['get', 'level']], level]
+            ['==', ['to-number', ['get', 'level']], level],
+            ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : amenityIds, true, false]
           ]
         "
       [layout]="{
@@ -259,5 +261,47 @@
         ></mgl-layer>
       </ng-container>
     </div>
+    <mgl-popup
+      *ngIf="selectedPoint"
+      [feature]="selectedPoint"
+    >
+      <h4>{{ selectedPoint.properties?.title }}</h4>
+    </mgl-popup>
   </mgl-map>
+  <button mat-raised-button color="primary" [disabled]="!endPoi || !startPoi" (click)="onGenerateRoute()" class="generate-route-btn">
+    <span *ngIf="!route">Näytä reitti kohteeseen</span>
+    <span *ngIf="route">Sulje reitti <i>&times;</i></span>
+  </button>
+  <div class="generate-route-block">
+    <ul>
+      <li>
+        <h5 class="label">Lähtöpiste</h5>
+        <mat-form-field appearance="outline">
+          <mat-label>Etsi</mat-label>
+          <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn" [(ngModel)]="startPoi">
+            <ng-template ng-optgroup-tmp let-item="item" let-index="index">
+              {{ item.category }}
+            </ng-template>
+            <ng-template ng-option-tmp let-item="item" let-index="index">
+              <img height="28" width="28" [src]="item.icon"/>
+              {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
+              <span class="level">L<small>{{ item.level + 1 }}</small></span>
+            </ng-template>
+          </ng-select>
+          <span matSuffix><img src="assets/search.svg" alt=""></span>
+        </mat-form-field>
+      </li>
+      <li>
+        <h5 class="label">Saavutettavuus</h5>
+        <div style="padding: 15px 0;">
+          <img src="assets/saavutettavuus.svg" alt="" height="30px" style="margin-right: 15px;">
+          <mat-slide-toggle
+            (change)="onAccessibleOnlyToggle($event)"
+            [checked]="accessibleOnly"
+            color="primary"
+            style="height: 30px; line-height: 30px; vertical-align: top;"></mat-slide-toggle>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>

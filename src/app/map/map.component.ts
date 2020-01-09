@@ -19,8 +19,8 @@ export class MapComponent implements OnInit, OnDestroy {
   mapStyle = '';
   mapCenter = [0, 0];
   mapZoom = [12];
-  mapBearing = 20;
-  mapPitch = 40;
+  mapBearing = 13;
+  mapPitch = 0;
   floorplans: any[] = [];
   mapLoaded = new EventEmitter<boolean>();
   isLoaded = false;
@@ -29,10 +29,12 @@ export class MapComponent implements OnInit, OnDestroy {
   currentUserData;
   selectedFloor;
   selectedPlace;
+  pois;
   amenities = [];
   amenityMap = {};
   amenityLinks = {};
   amenityBaseLinks: any = {};
+  amenityIds: string[] = [];
   features: any = {};
   filteredFeatures = [];
   featureCache = {};
@@ -86,6 +88,8 @@ export class MapComponent implements OnInit, OnDestroy {
     features: []
   };
   accessibleOnly = false;
+  activeAmenitiesToggle;
+  selectedPoint;
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -114,9 +118,9 @@ export class MapComponent implements OnInit, OnDestroy {
         this.amenityBaseLinks[item.id] = { uri: item.icon };
         this.amenityLinks[item.id] = { uri: `${GEO_API_ROOT}/amenities/${item.id}.png?token=${this.currentUser.token}` };
       }
+      this.amenityIds.push(item.id);
       return acc;
     }, {});
-
 
     if (!this.useCustomRoutingImages) {
       this.routingStartImage = this.amenityBaseLinks.route_start;
@@ -161,16 +165,41 @@ export class MapComponent implements OnInit, OnDestroy {
           this.centerOnPoi(poi);
         }
         this.generateHighlightSource(feature, 'endPoi');
-        this.generateRoute();
-      }),
-      this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
-        this.accessibleOnly = accessibleOnly;
-        this.generateRoute();
+        if (!poi) {
+          this.cancelRoute();
+        }
       }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
         this.setPlace(place);
+      }),
+      this.sidebarService.getAmenityToggleListener().subscribe(amenities => {
+        this.activeAmenitiesToggle = amenities;
       })
     );
+    this.pois = this.sidebarService.sortedPOIs;
+    this.sidebarService.startPointListener.next(this.pois[0]);
+  }
+
+  poiSearchFn(term: string, item) {
+    term = term.toLocaleLowerCase();
+    return item.search_query.toLocaleLowerCase().indexOf(term) > -1;
+  }
+
+  onStartPointSelect(poi) {
+    this.sidebarService.startPointListener.next(poi);
+  }
+
+  onAccessibleOnlyToggle(e) {
+    this.accessibleOnly = e.checked;
+    this.generateRoute();
+  }
+
+  onGenerateRoute() {
+    if (this.route) {
+      this.cancelRoute();
+    } else {
+      this.generateRoute();
+    }
   }
 
   centerOnPoi(poi) {
@@ -320,7 +349,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.startPoi && this.endPoi) {
       this.mapService.getRoute(this.startPoi, this.endPoi, this.accessibleOnly, false, this.currentUser.token)
         .subscribe(route => {
-          const startFloor = this.floors.filter(f => f.level === this.startPoi.level)[0];
+          const startFloor = this.floors.filter(f => f.level === this.startPoi.level && f.place_id === this.selectedPlace.id)[0];
           this.route = route;
           this.setFloor(startFloor); // this will also generate routing source
         }, error => {
@@ -463,6 +492,9 @@ export class MapComponent implements OnInit, OnDestroy {
       if (type === 'click') {
         newHighlight.properties.usecase = 'clicked-point-highlight';
         previousClickHighlight = this.highlightPointsCollection.features.filter(f => f.id === newHighlight.id && f.properties.usecase === 'clicked-point-highlight')[0];
+        const clickedPoi = this.pois.filter(item => item.id === feature.properties.id)[0];
+        this.selectedPoint = feature;
+        this.sidebarService.endPointListener.next(clickedPoi);
       } else if (type === 'startPoi') {
         newHighlight.properties.usecase = 'startpoi-point-highlight';
       } else if (type === 'endPoi') {
@@ -496,7 +528,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.mapLoaded.emit(true);
     this.map.resize();
     this.isLoaded = true;
-    this.mapZoom = [17];
+    this.mapZoom = [18.35];
     this.subs.push(
       this.sidebarService.getSidebarStatusListener().subscribe(() => {
         if (this.map) {
@@ -519,6 +551,13 @@ export class MapComponent implements OnInit, OnDestroy {
           let changed = false;
           let expressions = false;
           const levelProperties = ['level', 'level_min', 'level_max'];
+
+          // TODO quick fix of some invisible layers, needs to find more clever way
+          if (filterArray[2][1] === 'visibility') {
+            filterArray.splice(2, 1);
+            this.map.setFilter(l.id, filterArray);
+          }
+
           filterArray.forEach(filter => {
             if (Array.isArray(filter) && Array.isArray(filter[1]) && filter[1][0] === 'to-number' && levelProperties.includes(filter[1][1][1])) {
               filter[2] = this.level;

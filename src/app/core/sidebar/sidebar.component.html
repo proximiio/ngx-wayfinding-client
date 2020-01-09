@@ -3,28 +3,26 @@
     <fa-icon [icon]="['fal', 'times']"></fa-icon>
   </a>
   <div class="brand">
-    <img [src]="config.logo ? config.logo : 'assets/proximiio-logo-vertical.png'">
+    <img [src]="'assets/Helsinki-logo-2017-white.png'">
+    <h3>Kalasataman terveys -ja hyvinvointikeskus</h3>
+    <div class="divider"></div>
   </div>
-  <mat-form-field appearance="outline" *ngIf="showPlaceSelector">
-    <mat-label>{{ placeSelectorLabel }}</mat-label>
-    <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace" ></ng-select>
-    <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
-  </mat-form-field>
+  <h4 style="margin-bottom: 5px">{{ endPointLabel }}</h4>
   <mat-form-field appearance="outline">
-    <mat-label>{{ endPointLabel }}</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn">
+    <mat-label>Esim. odotustila</mat-label>
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn" [(ngModel)]="endPoi">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
         {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span class="level">L<small>{{ item.level }}</small></span>
+        <span class="level">L<small>{{ item.level + 1 }}</small></span>
       </ng-template>
     </ng-select>
-    <span matPrefix><fa-icon [icon]="['fal', 'search']" transform="up-3"></fa-icon></span>
+    <span matSuffix><img src="assets/search.svg" alt=""></span>
   </mat-form-field>
-  <mat-form-field appearance="outline">
+  <mat-form-field appearance="outline" *ngIf="showStartPointPicker">
     <mat-label>{{ startPointLabel }}</mat-label>
     <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
@@ -33,7 +31,7 @@
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
         {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span class="level">L<small>{{ item.level }}</small></span>
+        <span class="level">L<small>{{ item.level + 1 }}</small></span>
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>
@@ -49,6 +47,17 @@
   <div class="powered-by" *ngIf="showPoweredBy">
     <img src="assets/proximiio-logo-only.png" alt="Proximi.io">
     <h4 class="title">Powered by Proximi.io</h4>
+  </div>
+  <div class="amenity-toggle-list">
+    <h4 style="margin-bottom: 10px">Näytä kartalla</h4>
+    <ul>
+      <li *ngFor="let item of amenityToggles" [ngClass]="{ 'active': item.amenities === activeAmenitiesToggle }">
+        <a href="javascript:;" (click)="onAmenityToggle(item)">
+          <span class="icon"><img [src]="item.icon" alt=""></span>
+          {{ item.label }}
+        </a>
+      </li>
+    </ul>
   </div>
 </div>
 

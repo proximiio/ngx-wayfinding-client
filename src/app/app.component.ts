@@ -17,7 +17,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   sidenavIsOpened = true;
   userIsAuthenticated = false;
   isLoading = false;
-  theme$ = 'default-theme';
+  theme$ = 'custom-theme';
   currentUserConfig;
   sendAnalytics = false;
   private authListenerSubs: Subscription;

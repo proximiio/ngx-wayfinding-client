@@ -1,14 +1,26 @@
 .sidebar {
   padding: 0 1rem 1rem;
+  overflow-x: hidden;
 
   .brand {
-    background-color: white;
-    padding: 20px 10px;
-    width: 120px;
-    border-radius: 0 0 6px 6px;
-    margin-bottom: 2rem;
+    background-color: #0000BF;
+    padding: 30px 10px 0;
+    margin: 0 -1.6rem 2rem;
+    text-align: center;
 
     img {
+      width: 130px;
+    }
+
+    h3 {
+      width: 180px;
+      margin: 2rem auto;
+      color: white;
+    }
+
+    .divider {
+      background-image: url("../../../assets/divider-pattern.png");
+      height: 27px;
       width: 100%;
     }
   }
@@ -59,10 +71,16 @@
   }
 
   ::ng-deep {
+    .ng-select {
+      .ng-arrow-wrapper {
+        display: none;
+      }
+    }
     .mat-form-field-flex {
       align-items: normal;
     }
-    .mat-form-field-prefix {
+    .mat-form-field-prefix,
+    .mat-form-field-suffix {
       width: 24px;
       bottom: -23px;
     }
@@ -95,9 +113,10 @@
           bottom: calc(100% + 1.45em )
         }
       }
-      .mat-form-field-prefix {
+      .mat-form-field-prefix,
+      .mat-form-field-suffix  {
         bottom: 0;
-        padding-top: 24px;
+        padding-top: 18px;
       }
     }
   }
@@ -139,6 +158,44 @@
     .title {
       margin-top: 0;
       color: #333;
+    }
+  }
+  .amenity-toggle-list {
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        .icon {
+          display: inline-block;
+          width: 50px;
+          margin-right: 10px;
+          text-align: center;
+          vertical-align: middle;
+          img {
+            height: 20px;
+          }
+        }
+        a {
+          display: block;
+          color: #000;
+          font-size: 13px;
+          text-decoration: none;
+          padding: 7px 5px;
+          border-radius: 4px;
+          transition: all .25s linear;
+
+          &:hover {
+            background-color: #91b8d7;
+          }
+        }
+        &.active {
+          a {
+            background-color: rgba(0,0,0,.2);
+          }
+        }
+      }
     }
   }
 }
