@@ -177,7 +177,7 @@ export class MapComponent implements OnInit, OnDestroy {
       })
     );
     this.pois = this.sidebarService.sortedPOIs;
-    this.sidebarService.startPointListener.next(this.pois[0]);
+    this.sidebarService.startPointListener.next(this.pois.filter(poi => poi.id === 'df84018a247235f9368cb2f1bd3a5c6b')[0]);
   }
 
   poiSearchFn(term: string, item) {

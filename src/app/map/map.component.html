@@ -55,7 +55,11 @@
             'all',
             ['==', ['get', 'usecase'], 'poi'],
             ['==', ['to-number', ['get', 'level']], level],
-            ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : amenityIds, true, false]
+            [
+              'any',
+              ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
+            ]
           ]
         "
       [layout]="{
@@ -80,7 +84,11 @@
             'all',
             ['==', ['get', 'usecase'], 'poi'],
             ['==', ['to-number', ['get', 'level']], level],
-            ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : amenityIds, true, false]
+            [
+              'any',
+              ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
+            ]
           ]
         "
       [layout]="{
