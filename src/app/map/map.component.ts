@@ -58,13 +58,14 @@ export class MapComponent implements OnInit, OnDestroy {
   iconSize = 0.5;
   imagesIteration = 0;
   images = {};
-  font = 'Klokantech Noto Sans Regular';
+  font = 'Open Sans Regular';
   routeLineStyle = {
     'line-opacity': 1,
-    'line-color': '#00ee00',
-    'line-width': 12
+    'line-color': '#0000BF',
+    'line-width': 4,
+    'line-dasharray': [1.6, 0.6]
   };
-  useDottedRouteLine = true;
+  useDottedRouteLine = false;
   singleLevel = false;
   showLevelChangers = true;
   Constants = Constants.default;
@@ -174,7 +175,11 @@ export class MapComponent implements OnInit, OnDestroy {
         this.setPlace(place);
       }),
       this.sidebarService.getAmenityToggleListener().subscribe(amenities => {
-        this.activeAmenitiesToggle = amenities;
+        if (amenities) {
+          this.activeAmenitiesToggle = amenities[0] === 'all' ? this.amenityIds : amenities;
+        } else {
+          this.activeAmenitiesToggle = null;
+        }
       })
     );
     this.pois = this.sidebarService.sortedPOIs;
