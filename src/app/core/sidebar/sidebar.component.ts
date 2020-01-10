@@ -63,7 +63,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }, {
     label: 'Julkinen liikenne',
     icon: 'assets/julkinen_liikenne.svg',
-    amenities: ['10f08061-2a05-496d-a4f5-4d48492cf2ed', '871ecdb2-25fc-4912-a712-baf1676bc0b2', '3c53ede2-cf62-47e2-b6a8-3ee720959b9e']
+    amenities: ['235390d4-ad06-4b5b-b73b-ab9f02a5e648', '892f8ded-5ad3-4876-9c7b-8b008eec9fde']
   }, {
     label: 'Kaikki kohteet',
     icon: 'assets/kaikki_kohteet.svg',

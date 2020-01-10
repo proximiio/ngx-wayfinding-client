@@ -35,7 +35,7 @@
     <ng-container *ngFor="let key of objectKeys(images)">
       <mgl-image
         [id]="key"
-        [url]="images[key].uri"
+        [url]="images[key]?.uri"
       >
       </mgl-image>
     </ng-container>
