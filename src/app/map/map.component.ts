@@ -90,6 +90,7 @@ export class MapComponent implements OnInit, OnDestroy {
   accessibleOnly = false;
   activeAmenitiesToggle;
   selectedPoint;
+  showRouteIcons = false;
   @Input() mapMovingMethod: string;
   private subs = [];
 
