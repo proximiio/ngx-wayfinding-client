@@ -46,7 +46,7 @@
     ></mgl-geojson-source>
     <mgl-layer
       type="symbol"
-      [id]="Constants.LAYER_POIS_ICONS"
+      [id]="Constants.LAYER_POIS_ICONS+'-far'"
       [source]="Constants.SOURCE_POI"
       [minzoom]="17"
       [maxzoom]="24"
@@ -64,7 +64,9 @@
         "
       [layout]="{
           'icon-image': '{amenity}',
-          'icon-size': iconSize,
+          'icon-size': 0.3,
+          'text-anchor': 'top',
+          'text-offset': [0, 2],
           'symbol-placement': 'point',
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
@@ -75,9 +77,9 @@
     ></mgl-layer>
     <mgl-layer
       type="symbol"
-      [id]="Constants.LAYER_POIS_LABELS"
+      [id]="Constants.LAYER_POIS_ICONS+'-nearer'"
       [source]="Constants.SOURCE_POI"
-      [minzoom]="18"
+      [minzoom]="19"
       [maxzoom]="24"
       [filter]="
           [
@@ -92,9 +94,103 @@
           ]
         "
       [layout]="{
+          'icon-image': '{amenity}',
+          'icon-size': 0.5,
+          'text-anchor': 'top',
+          'text-offset': [0, 2],
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          'text-allow-overlap': true,
+          'visibility': showPOI ? 'visible' : 'none'
+        }"
+      (click)="onPoiClick($event)"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_POIS_ICONS+'-nearest'"
+      [source]="Constants.SOURCE_POI"
+      [minzoom]="22"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'poi'],
+            ['==', ['to-number', ['get', 'level']], level],
+            [
+              'any',
+              ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
+            ]
+          ]
+        "
+      [layout]="{
+          'icon-image': '{amenity}',
+          'icon-size': 1,
+          'text-anchor': 'top',
+          'text-offset': [0, 2],
+          'symbol-placement': 'point',
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          'text-allow-overlap': true,
+          'visibility': showPOI ? 'visible' : 'none'
+        }"
+      (click)="onPoiClick($event)"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_POIS_LABELS"
+      [source]="Constants.SOURCE_POI"
+      [minzoom]="18"
+      [maxzoom]="20"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'poi'],
+            ['==', ['to-number', ['get', 'level']], level],
+            [
+              'any',
+              ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
+            ]
+          ]
+        "
+      [layout]="{
+          'text-anchor': 'top',
           'text-offset': [0, 2],
           'text-field': ['get', 'title'],
           'text-size': 14,
+          'text-font': [font],
+          'symbol-placement': 'point',
+          'text-allow-overlap': false,
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          'visibility': showPOI ? 'visible' : 'none'
+        }"
+    ></mgl-layer>
+    <mgl-layer
+      type="symbol"
+      [id]="Constants.LAYER_POIS_LABELS+'-nearer'"
+      [source]="Constants.SOURCE_POI"
+      [minzoom]="20"
+      [maxzoom]="24"
+      [filter]="
+          [
+            'all',
+            ['==', ['get', 'usecase'], 'poi'],
+            ['==', ['to-number', ['get', 'level']], level],
+            [
+              'any',
+              ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
+            ]
+          ]
+        "
+      [layout]="{
+          'text-anchor': 'top',
+          'text-offset': [0, 2],
+          'text-field': ['get', 'title'],
+          'text-size': 24,
           'text-font': [font],
           'symbol-placement': 'point',
           'text-allow-overlap': false,
@@ -207,7 +303,7 @@
         'circle-blur': 0.5,
         'circle-color': '#3887be'
       }"
-      [before]="Constants.LAYER_POIS_ICONS"
+      [before]="Constants.LAYER_POIS_ICONS+'-far'"
     ></mgl-layer>
     <mgl-layer
       *ngIf="highlightSelectedPoi"
@@ -228,7 +324,7 @@
         'circle-blur': 0.5,
         'circle-color': '#40dc7e'
       }"
-      [before]="Constants.LAYER_POIS_ICONS"
+      [before]="Constants.LAYER_POIS_ICONS+'-far'"
     ></mgl-layer>
     <mgl-layer
       *ngIf="highlightSelectedPoi"
@@ -249,7 +345,7 @@
         'circle-blur': 0.5,
         'circle-color': '#8a7fff'
       }"
-      [before]="Constants.LAYER_POIS_ICONS"
+      [before]="Constants.LAYER_POIS_ICONS+'-far'"
     ></mgl-layer>
     <div *ngIf="floorplans.length > 0">
       <ng-container *ngFor="let floorplan of floorplans">
