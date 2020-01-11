@@ -251,8 +251,10 @@ mgl-map {
   }
   .generate-route-btn {
     bottom: 125px;
+    position: fixed;
   }
   .generate-route-block {
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
