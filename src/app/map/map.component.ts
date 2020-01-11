@@ -501,7 +501,7 @@ export class MapComponent implements OnInit, OnDestroy {
         previousClickHighlight = this.highlightPointsCollection.features.filter(f => f.id === newHighlight.id && f.properties.usecase === 'clicked-point-highlight')[0];
         const clickedPoi = this.pois.filter(item => item.id === feature.properties.id)[0];
         this.selectedPoint = feature;
-        this.sidebarService.endPointListener.next(clickedPoi);
+        this.sidebarService.onEndPointSelect(clickedPoi);
       } else if (type === 'startPoi') {
         newHighlight.properties.usecase = 'startpoi-point-highlight';
       } else if (type === 'endPoi') {
