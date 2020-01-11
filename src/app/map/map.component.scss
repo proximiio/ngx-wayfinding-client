@@ -267,8 +267,13 @@ mgl-map {
       li {
         padding-top: .8rem;
 
-        ::ng-deep .mat-form-field-wrapper {
-          padding-bottom: .5rem;
+        ::ng-deep {
+          .mat-form-field-wrapper {
+            padding-bottom: .5rem;
+          }
+          .mat-form-field-infix {
+            width: 120px;
+          }
         }
       }
     }
