@@ -1,6 +1,8 @@
 <div [class]="'theme-wrapper ' + theme$">
+  <app-topbar *ngIf="useTopBar"></app-topbar>
   <mat-sidenav-container *ngIf="userIsAuthenticated">
     <mat-sidenav
+      [ngClass]="{'topbar-active': useTopBar}"
       [ngStyle]="{'background-color': '#9FC9EB'}"
       [mode]="sidebarService.sidenavMode"
       [opened]="sidenavIsOpened"

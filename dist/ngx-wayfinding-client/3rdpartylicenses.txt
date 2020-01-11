@@ -87,9 +87,17 @@ THE SOFTWARE.
 
 @angular/material/button
 
+@angular/material/core
+
 @angular/material/dialog
 
+@angular/material/divider
+
 @angular/material/form-field
+
+@angular/material/list
+
+@angular/material/menu
 
 @angular/material/progress-spinner
 

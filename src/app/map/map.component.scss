@@ -244,3 +244,34 @@ mgl-map {
     }
   }
 }
+
+@media screen and (max-width: 960px) {
+  .map-floors {
+    top: 170px;
+  }
+  .generate-route-btn {
+    bottom: 125px;
+  }
+  .generate-route-block {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+
+    ul {
+      border-radius: 0;
+      border: 0;
+
+      li {
+        padding-top: .8rem;
+
+        ::ng-deep .mat-form-field-wrapper {
+          padding-bottom: .5rem;
+        }
+      }
+    }
+  }
+  .toggle-sidebar.topbar-active {
+    display: none;
+  }
+}

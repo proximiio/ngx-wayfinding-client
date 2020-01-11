@@ -8,6 +8,7 @@ import { FontawesomeModule } from '../fontawesome.module';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgSelectFormFieldControlDirective } from './ng-select.directive';
+import { TopbarComponent } from './topbar/topbar.component';
 
 @NgModule({
   imports: [
@@ -21,11 +22,13 @@ import { NgSelectFormFieldControlDirective } from './ng-select.directive';
   ],
   declarations: [
     NgSelectFormFieldControlDirective,
-    SidebarComponent
+    SidebarComponent,
+    TopbarComponent
   ],
   exports: [
     NgSelectFormFieldControlDirective,
-    SidebarComponent
+    SidebarComponent,
+    TopbarComponent
   ]
 })
 export class CoreModule {}

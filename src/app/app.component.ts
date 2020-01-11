@@ -20,6 +20,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   theme$ = 'custom-theme';
   currentUserConfig;
   sendAnalytics = false;
+  useTopBar = true;
   private authListenerSubs: Subscription;
 
   constructor(

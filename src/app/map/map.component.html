@@ -1,5 +1,5 @@
 <div (resized)="onResized($event)">
-  <a href="javascript:;" (click)="sidebarService.toggleSidebar();" class="toggle-sidebar">
+  <a href="javascript:;" (click)="sidebarService.toggleSidebar();" class="toggle-sidebar" [ngClass]="{'topbar-active': useTopBar}">
     <fa-icon [icon]="['fal', 'ellipsis-v']" size="lg"></fa-icon>
   </a>
   <div class="map-floors">

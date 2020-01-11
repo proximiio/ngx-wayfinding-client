@@ -1,0 +1,43 @@
+<div class="content">
+  <div class="brand">
+    <img [src]="'assets/Helsinki-logo-2017-white.png'">
+    <h3>Kalasataman terveys -ja hyvinvointikeskus</h3>
+  </div>
+  <div class="nav">
+    <div class="search">
+      <mat-form-field appearance="outline">
+        <mat-label>Esim. odotustila</mat-label>
+        <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="sidebarService.onEndPointSelect($event)" [searchFn]="sidebarService.poiSearchFn" [(ngModel)]="sidebarService.endPoi">
+          <ng-template ng-optgroup-tmp let-item="item" let-index="index">
+            {{ item.category }}
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item" let-index="index">
+            <img height="28" width="28" [src]="item.icon"/>
+            {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
+            <span class="level">L<small>{{ item.level + 1 }}</small></span>
+          </ng-template>
+        </ng-select>
+        <span matSuffix><img src="assets/search-white.svg" alt=""></span>
+      </mat-form-field>
+    </div>
+    <div class="menu">
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Näytä kartalla">
+        <fa-icon [icon]="['fal', 'layer-group']"></fa-icon>
+      </button>
+      <mat-menu #menu="matMenu" [classList]="'amenityToggleMenu'">
+        <h4>Näytä kartalla</h4>
+        <mat-divider></mat-divider>
+        <mat-selection-list (selectionChange)="sidebarService.onAmenityToggle($event.option.value)">
+            <mat-list-option
+              *ngFor="let item of sidebarService.amenityToggles"
+              [value]="item"
+              [selected]="item.amenities === sidebarService.activeAmenitiesToggle">
+              <span class="icon"><img [src]="item.icon" alt=""></span>
+              {{ item.label }}
+            </mat-list-option>
+        </mat-selection-list>
+      </mat-menu>
+    </div>
+  </div>
+</div>
+

@@ -7,10 +7,10 @@
     <h3>Kalasataman terveys -ja hyvinvointikeskus</h3>
     <div class="divider"></div>
   </div>
-  <h4 style="margin-bottom: 5px">{{ endPointLabel }}</h4>
+  <h4 style="margin-bottom: 5px">{{ sidebarService.endPointLabel }}</h4>
   <mat-form-field appearance="outline">
     <mat-label>Esim. odotustila</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn" [(ngModel)]="endPoi">
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="sidebarService.onEndPointSelect($event)" [searchFn]="sidebarService.poiSearchFn" [(ngModel)]="sidebarService.endPoi">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>
@@ -23,7 +23,7 @@
     <span matSuffix><img src="assets/search.svg" alt=""></span>
   </mat-form-field>
   <mat-form-field appearance="outline" *ngIf="showStartPointPicker">
-    <mat-label>{{ startPointLabel }}</mat-label>
+    <mat-label>{{ sidebarService.startPointLabel }}</mat-label>
     <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
@@ -51,8 +51,8 @@
   <div class="amenity-toggle-list">
     <h4 style="margin-bottom: 10px">Näytä kartalla</h4>
     <ul>
-      <li *ngFor="let item of amenityToggles" [ngClass]="{ 'active': item.amenities === activeAmenitiesToggle }">
-        <a href="javascript:;" (click)="onAmenityToggle(item)">
+      <li *ngFor="let item of sidebarService.amenityToggles" [ngClass]="{ 'active': item.amenities === sidebarService.activeAmenitiesToggle }">
+        <a href="javascript:;" (click)="sidebarService.onAmenityToggle(item)">
           <span class="icon"><img [src]="item.icon" alt=""></span>
           {{ item.label }}
         </a>

@@ -1,0 +1,182 @@
+.content {
+  background: #0000BF;
+  color: white;
+  padding: 1rem 1rem .5rem;
+
+  .brand {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    img {
+      display: inline-block;
+      height: 50px;
+      margin-right: 1.5rem;
+    }
+    h3 {
+      display: inline-block;
+      text-align: center;
+      font-size: 16px;
+    }
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    .search {
+      flex-grow: 1;
+    }
+    .menu {
+      width: 70px;
+      padding: .6rem 0;
+      text-align: center;
+      button {
+        font-size: 26px;
+      }
+    }
+  }
+
+  .mat-form-field {
+    margin-top: .5rem;
+    width: 100%;
+  }
+
+  ::ng-deep .ng-option {
+    >img {
+      vertical-align: middle;
+      margin-top: -5px;
+    }
+    >span.level {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: block;
+      border: 1px solid #222;
+      color: #222;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+    }
+  }
+
+  ::ng-deep {
+    .ng-select {
+      .ng-arrow-wrapper {
+        display: none;
+      }
+    }
+    .mat-form-field-flex {
+      align-items: normal;
+    }
+    .mat-form-field-prefix,
+    .mat-form-field-suffix {
+      width: 24px;
+      bottom: -23px;
+    }
+    .ng-dropdown-panel {
+      background-color: white;
+      color: rgba(0, 0, 0, 0.87) !important;
+      .ng-dropdown-panel-items {
+        .ng-option {
+          color: rgba(0, 0, 0, 0.87);
+          &.ng-option-marked {
+            background: rgba(0, 0, 0, 0.04);
+          }
+          &.ng-option-selected {
+            background: rgba(0, 0, 0, 0.12);
+            color: #3f51b5;
+          }
+        }
+        .ng-optgroup {
+          color: black;
+        }
+      }
+    }
+    .mat-form-field {
+      font-size: 14px;
+      &.mat-form-field-appearance-outline {
+        .mat-form-field-infix {
+          padding: .5em 0 .5em 0;
+        }
+        .mat-form-field-label {
+          top: 1.4em;
+        }
+        .mat-form-field-outline {
+          color: rgba(255,255,255,.2);
+        }
+        .mat-form-field-outline-thick {
+          color: rgba(255,255,255,.87);
+        }
+        .mat-form-field-label {
+          color: rgba(255,255,255,.6);
+        }
+        .mat-form-field-wrapper {
+          padding-bottom: 0;
+        }
+        .ng-select {
+          top: -4px;
+          .ng-dropdown-panel.ng-select-bottom {
+            top: calc(100% + 1.25em )
+          }
+          .ng-dropdown-panel.ng-select-top {
+            bottom: calc(100% + 1.45em )
+          }
+        }
+        .ng-select,
+        .ng-select-container,
+        .ng-input > input {
+          color: rgba(255,255,255,.87)!important;
+        }
+        .ng-clear-wrapper, .ng-arrow-wrapper {
+          .ng-clear {
+            line-height: .8;
+          }
+          color: rgba(255,255,255,.4);
+          &:hover {
+            color: rgba(255,255,255,.87);
+          }
+        }
+        .mat-form-field-prefix,
+        .mat-form-field-suffix  {
+          bottom: 0;
+          padding-top: 7px;
+        }
+      }
+      &.mat-focused {
+        .mat-form-field-label {
+          color: rgba(255,255,255,.87);
+        }
+      }
+      &.mat-form-field-should-float {
+        .mat-form-field-label {
+          top: 1.8em;
+        }
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .amenityToggleMenu {
+    .mat-list-base .mat-list-item .mat-list-text,
+    .mat-list-base .mat-list-option .mat-list-text {
+      flex-direction: row;
+    }
+    h4 {
+      text-align: center;
+      margin: .5rem 0;
+    }
+    .icon {
+      display: inline-block;
+      width: 30px;
+      margin-right: 10px!important;
+      text-align: center;
+      vertical-align: middle;
+      img {
+        height: 12px;
+      }
+    }
+  }
+}

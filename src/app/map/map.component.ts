@@ -92,6 +92,7 @@ export class MapComponent implements OnInit, OnDestroy {
   activeAmenitiesToggle;
   selectedPoint;
   showRouteIcons = false;
+  useTopBar = true;
   @Input() mapMovingMethod: string;
   private subs = [];
 
