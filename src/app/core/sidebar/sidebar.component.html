@@ -24,7 +24,7 @@
   </mat-form-field>
   <mat-form-field appearance="outline" *ngIf="showStartPointPicker">
     <mat-label>{{ sidebarService.startPointLabel }}</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="sidebarService.poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>

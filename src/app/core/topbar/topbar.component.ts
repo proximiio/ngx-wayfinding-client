@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarService } from '../sidebar/sidebar.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-topbar',
@@ -10,10 +11,18 @@ export class TopbarComponent implements OnInit {
   pois;
 
   constructor(
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
-    this.pois = this.sidebarService.sortedPOIs;
+    if (this.authService.getIsAuth()) {
+      this.pois = this.sidebarService.sortedPOIs;
+    }
+    this.authService.getAuthStatusListener().subscribe(auth => {
+      if (auth) {
+        this.pois = this.sidebarService.sortedPOIs;
+      }
+    });
   }
 }
