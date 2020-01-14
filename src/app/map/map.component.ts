@@ -143,6 +143,8 @@ export class MapComponent implements OnInit, OnDestroy {
     if (!this.mapMovingMethod) {
       this.mapMovingMethod = 'flyTo';
     }
+
+    this.activeAmenitiesToggle = this.amenityIds;
   }
 
   ngOnInit() {
@@ -164,7 +166,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
         const feature = poi ? this.filteredFeatures.filter(f => f.properties.id === poi.id)[0] : null;
-        if (poi && !this.startPoi) {
+        if (poi) {
           this.centerOnPoi(poi);
         }
         this.generateHighlightSource(feature, 'endPoi');

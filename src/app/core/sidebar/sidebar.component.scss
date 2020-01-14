@@ -21,7 +21,7 @@
 
     .divider {
       background-image: url("../../../assets/divider-pattern.png");
-      height: 27px;
+      height: 26px;
       width: 100%;
     }
   }
@@ -64,7 +64,7 @@
       display: block;
       border: 1px solid #222;
       color: #222;
-      width: 26px;
+      width: 46px;
       height: 26px;
       line-height: 26px;
       text-align: center;
@@ -72,6 +72,10 @@
   }
 
   ::ng-deep {
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+      padding-right: 50px;
+      white-space: normal;
+    }
     .ng-select {
       .ng-arrow-wrapper {
         display: none;

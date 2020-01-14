@@ -14,7 +14,7 @@
           <ng-template ng-option-tmp let-item="item" let-index="index">
             <img height="28" width="28" [src]="item.icon"/>
             {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-            <span class="level">L<small>{{ item.level + 1 }}</small></span>
+            <span class="level">KRS<small>{{ item.level + 1 }}</small></span>
           </ng-template>
         </ng-select>
         <span matSuffix><img src="assets/search-white.svg" alt=""></span>
@@ -31,7 +31,7 @@
             <mat-list-option
               *ngFor="let item of sidebarService.amenityToggles"
               [value]="item"
-              [selected]="item.amenities === sidebarService.activeAmenitiesToggle">
+              [selected]="item.amenities[0] === sidebarService.activeAmenitiesToggle[0]">
               <span class="icon"><img [src]="item.icon" alt=""></span>
               {{ item.label }}
             </mat-list-option>

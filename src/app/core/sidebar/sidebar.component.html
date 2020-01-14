@@ -17,7 +17,7 @@
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
         {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span class="level">L<small>{{ item.level + 1 }}</small></span>
+        <span class="level">KRS<small>{{ item.level + 1 }}</small></span>
       </ng-template>
     </ng-select>
     <span matSuffix><img src="assets/search.svg" alt=""></span>
@@ -31,7 +31,7 @@
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
         {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span class="level">L<small>{{ item.level + 1 }}</small></span>
+        <span class="level">KRS<small>{{ item.level + 1 }}</small></span>
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>
@@ -51,7 +51,7 @@
   <div class="amenity-toggle-list">
     <h4 style="margin-bottom: 10px">Näytä kartalla</h4>
     <ul>
-      <li *ngFor="let item of sidebarService.amenityToggles" [ngClass]="{ 'active': item.amenities === sidebarService.activeAmenitiesToggle }">
+      <li *ngFor="let item of sidebarService.amenityToggles" [ngClass]="{ 'active': item.amenities[0] === sidebarService.activeAmenitiesToggle[0] }">
         <a href="javascript:;" (click)="sidebarService.onAmenityToggle(item)">
           <span class="icon"><img [src]="item.icon" alt=""></span>
           {{ item.label }}

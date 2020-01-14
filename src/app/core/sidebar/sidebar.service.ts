@@ -32,15 +32,19 @@ export class SidebarService {
   }, {
     label: 'Palvelut',
     icon: 'assets/palvelut.png',
-    amenities: ['9c354cbc-626c-48b5-9013-b5a38b4b72e2', '5cc85e40-6473-40e6-a656-3bbd3795a7cf', '6eb57c98-0771-4ea9-b6f5-285668782ec3']
+    amenities: ['9c354cbc-626c-48b5-9013-b5a38b4b72e2', '5cc85e40-6473-40e6-a656-3bbd3795a7cf', '6eb57c98-0771-4ea9-b6f5-285668782ec3', 'f5acbc25-c987-4ad4-bd51-f093a06fec0f']
+  }, {
+    label: 'Odotustilat',
+    icon: 'assets/odotustila.svg',
+    amenities: ['3423b515-a602-4b93-b65f-9ddc7ab62e7a']
+  }, {
+    label: 'Ryhmähuoneet',
+    icon: 'assets/ryhmahuoneet.svg',
+    amenities: ['41e38337-db5c-43f1-9793-96a18e4fdc14']
   }, {
     label: 'Asiakas-wc',
     icon: 'assets/wc.svg',
     amenities: ['caf562af-86e6-49d3-ad7a-e91431c6a303', '55b2b397-695b-40a4-982f-70e0792faa72']
-  }, {
-    label: 'Lastenhoitotilat',
-    icon: 'assets/lastenhoitotilat.svg',
-    amenities: ['9dc430bc-ab7b-4ac1-95c8-5b353b806a53', '2cce4806-e41d-4ca1-978c-72e7f3414ba2']
   }, {
     label: 'Parkkipaikat',
     icon: 'assets/parkkipaikat.svg',
@@ -54,7 +58,7 @@ export class SidebarService {
     icon: 'assets/kaikki_kohteet.svg',
     amenities: ['all']
   }];
-  public activeAmenitiesToggle;
+  public activeAmenitiesToggle = ['all'];
   public endPoi;
   public sidebarStatus = new Subject<boolean>();
   public startPointListener = new Subject<any>();
@@ -175,7 +179,7 @@ export class SidebarService {
   }
 
   onAmenityToggle(item: AmenityToggleModel) {
-    this.activeAmenitiesToggle = this.activeAmenitiesToggle === item.amenities ? null : item.amenities;
+    this.activeAmenitiesToggle = this.activeAmenitiesToggle[0] === item.amenities[0] ? [''] : item.amenities;
     this.amenityToggleListener.next(this.activeAmenitiesToggle);
   }
 }

@@ -5,7 +5,7 @@
   <div class="map-floors">
     <ul>
       <li>
-        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'up'">{{ currentLevelChanger.nextLevel }}</span>
+        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'up'">{{ currentLevelChanger.nextLevel + 1 }}</span>
         <a href="javascript:;"
            [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'up'}"
            (click)="onFloorChange('up', currentLevelChanger)">
@@ -14,7 +14,7 @@
       </li>
       <li class="current-floor">{{ selectedFloor ? selectedFloor.name : 0 }}</li>
       <li>
-        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'down'">{{ currentLevelChanger.nextLevel }}</span>
+        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'down'">{{ currentLevelChanger.nextLevel + 1}}</span>
         <a href="javascript:;"
            [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'down'}"
            (click)="onFloorChange('down', currentLevelChanger)">
@@ -32,6 +32,9 @@
     [movingMethod]="mapMovingMethod"
     (load)="onLoad($event)"
   >
+    <mgl-control
+      mglNavigation
+    ></mgl-control>
     <ng-container *ngFor="let key of objectKeys(images)">
       <mgl-image
         [id]="key"
@@ -58,6 +61,7 @@
             [
               'any',
               ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['==', ['get', 'id'], 'd58aaffa-ef49-4fce-8bac-cdd0b625f18c:44e11c74-9671-43fd-8f18-d7189cc41f8d'],
               ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
             ]
           ]
@@ -89,6 +93,7 @@
             [
               'any',
               ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['==', ['get', 'id'], 'd58aaffa-ef49-4fce-8bac-cdd0b625f18c:44e11c74-9671-43fd-8f18-d7189cc41f8d'],
               ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
             ]
           ]
@@ -120,6 +125,7 @@
             [
               'any',
               ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['==', ['get', 'id'], 'd58aaffa-ef49-4fce-8bac-cdd0b625f18c:44e11c74-9671-43fd-8f18-d7189cc41f8d'],
               ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
             ]
           ]
@@ -151,6 +157,7 @@
             [
               'any',
               ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['==', ['get', 'id'], 'd58aaffa-ef49-4fce-8bac-cdd0b625f18c:44e11c74-9671-43fd-8f18-d7189cc41f8d'],
               ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
             ]
           ]
@@ -182,6 +189,7 @@
             [
               'any',
               ['match', ['get', 'id'], [startPoi.id, endPoi ? endPoi.id : 'undefined'], true, false],
+              ['==', ['get', 'id'], 'd58aaffa-ef49-4fce-8bac-cdd0b625f18c:44e11c74-9671-43fd-8f18-d7189cc41f8d'],
               ['match', ['get', 'amenity'], activeAmenitiesToggle ? activeAmenitiesToggle : ['undefined'], true, false]
             ]
           ]
@@ -289,7 +297,7 @@
       type="circle"
       [id]="Constants.LAYER_HIGHLIGHT_CLICKED_POINT"
       [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [minzoom]="17"
+      [minzoom]="12"
       [maxzoom]="24"
       [filter]="
           [
@@ -299,7 +307,15 @@
           ]
         "
       [paint]="{
-        'circle-radius': 38,
+        'circle-radius': {
+          'stops': [
+            [12, 24],
+            [16.99, 24],
+            [17, 30],
+            [21.99, 30],
+            [22, 80]
+          ]
+        },
         'circle-blur': 0.5,
         'circle-color': '#3887be'
       }"
@@ -310,7 +326,7 @@
       type="circle"
       [id]="Constants.LAYER_HIGHLIGHT_STARTPOI_POINT"
       [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [minzoom]="17"
+      [minzoom]="12"
       [maxzoom]="24"
       [filter]="
           [
@@ -320,7 +336,15 @@
           ]
         "
       [paint]="{
-        'circle-radius': 38,
+        'circle-radius': {
+          'stops': [
+            [12, 24],
+            [16.99, 24],
+            [17, 30],
+            [21.99, 30],
+            [22, 80]
+          ]
+        },
         'circle-blur': 0.5,
         'circle-color': '#40dc7e'
       }"
@@ -331,7 +355,7 @@
       type="circle"
       [id]="Constants.LAYER_HIGHLIGHT_ENDPOI_POINT"
       [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [minzoom]="17"
+      [minzoom]="12"
       [maxzoom]="24"
       [filter]="
           [
@@ -341,7 +365,15 @@
           ]
         "
       [paint]="{
-        'circle-radius': 38,
+        'circle-radius': {
+          'stops': [
+            [12, 24],
+            [16.99, 24],
+            [17, 30],
+            [21.99, 30],
+            [22, 80]
+          ]
+        },
         'circle-blur': 0.5,
         'circle-color': '#8a7fff'
       }"
@@ -370,6 +402,10 @@
       [feature]="selectedPoint"
     >
       <h4>{{ selectedPoint.properties?.title }}</h4>
+      <button mat-raised-button color="primary" [disabled]="!endPoi || !startPoi" (click)="onGenerateRoute()">
+        <span *ngIf="!route">Näytä reitti kohteeseen</span>
+        <span *ngIf="route">Sulje reitti <i>&times;</i></span>
+      </button>
     </mgl-popup>
   </mgl-map>
   <button mat-raised-button color="primary" [disabled]="!endPoi || !startPoi" (click)="onGenerateRoute()" class="generate-route-btn">
@@ -389,7 +425,7 @@
             <ng-template ng-option-tmp let-item="item" let-index="index">
               <img height="28" width="28" [src]="item.icon"/>
               {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-              <span class="level">L<small>{{ item.level + 1 }}</small></span>
+              <span class="level">KRS<small>{{ item.level + 1 }}</small></span>
             </ng-template>
           </ng-select>
           <span matSuffix><img src="assets/search.svg" alt=""></span>

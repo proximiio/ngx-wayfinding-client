@@ -73,22 +73,24 @@ app.post(Settings.basepath+'/analytics/ahoy/visits', function(request, response)
   const data = request.body;
   data.type = 'ahoy-visit';
   proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
-    console.log(response.data);
+    res.send(response.data);
   })
-    .catch(function (error) {
-      console.log(error);
-    });
+  .catch(function (error) {
+    console.log(error);
+    res.send(error);
+  });
 });
 
 app.post(Settings.basepath+'/analytics/ahoy/events', function(request, response) {
   const data = request.body;
   data.type = 'ahoy-event';
   proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
-    console.log(response.data);
+    res.send(response.data);
   })
-    .catch(function (error) {
-      console.log(error);
-    });
+  .catch(function (error) {
+    console.log(error);
+    res.send(error);
+  });
 });
 
 const server = http.createServer(app);
