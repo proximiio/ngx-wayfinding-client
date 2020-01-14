@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   authUrl: 'http://localhost:6005/kalasatama',
-  ahoyUrl: 'http://api.localhost:3000',
+  ahoyUrl: 'http://localhost:6005/kalasatama/analytics',
   appPrefix: 'ngx-wayfinding-'
 };
 
