@@ -462,8 +462,10 @@ export class MapComponent implements OnInit, OnDestroy {
         this.routeCollection.features = [...this.routeCollection.features, ...chunks];
       }
 
-      this.mapCenter = path.geometry.coordinates[0];
-      this.mapZoom = [19];
+      this.map.fitBounds(
+        [path.geometry.coordinates[0], path.geometry.coordinates[path.geometry.coordinates.length - 1]],
+        { padding: 50 }
+      );
 
       if (this.sidebarService.sidenavMode === 'over') {
         this.sidebarService.closeSidebar();

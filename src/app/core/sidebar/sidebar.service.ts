@@ -24,7 +24,7 @@ export class SidebarService {
   public amenityToggles: AmenityToggleModel[] = [{
     label: 'Ilmoittautuminen',
     icon: 'assets/ilmoittautuminen.svg',
-    amenities: ['ebc23e34-98e4-4f84-b1ac-52fe9419d1cb']
+    amenities: ['5cc2ad94-ffc0-462c-97a4-924712d4155a']
   }, {
     label: 'Asiakaspalvelu',
     icon: 'assets/asiakaspalvelu.svg',
@@ -32,7 +32,7 @@ export class SidebarService {
   }, {
     label: 'Palvelut',
     icon: 'assets/palvelut.png',
-    amenities: ['9c354cbc-626c-48b5-9013-b5a38b4b72e2', '5cc85e40-6473-40e6-a656-3bbd3795a7cf', '6eb57c98-0771-4ea9-b6f5-285668782ec3', 'f5acbc25-c987-4ad4-bd51-f093a06fec0f']
+    amenities: ['9c354cbc-626c-48b5-9013-b5a38b4b72e2', '5cc85e40-6473-40e6-a656-3bbd3795a7cf', '6eb57c98-0771-4ea9-b6f5-285668782ec3', 'd383915b-876f-4628-bfbe-29aa928cc2c7']
   }, {
     label: 'Odotustilat',
     icon: 'assets/odotustila.svg',
