@@ -69,6 +69,30 @@ app.get(Settings.basepath+'/*', function(req,res) {
   res.sendFile(path.join(__dirname,'dist/ngx-wayfinding-client/index.html'));
 });
 
+app.post(Settings.basepath+'/analytics/ahoy/visits', function(request, res) {
+  const data = request.body;
+  data.type = 'ahoy-visit';
+  proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
+    res.send(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+    res.send(error);
+  });
+});
+
+app.post(Settings.basepath+'/analytics/ahoy/events', function(request, res) {
+  const data = request.body;
+  data.type = 'ahoy-event';
+  proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
+    res.send(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+    res.send(error);
+  });
+});
+
 const server = http.createServer(app);
 server.listen(httpPort, '127.0.0.1', function() {
   console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}${Settings.basepath} **`)
