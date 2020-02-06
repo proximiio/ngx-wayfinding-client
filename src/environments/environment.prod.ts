@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
   authUrl: '/maria01',
-  ahoyUrl: 'https://api.example.com',
+  ahoyUrl: '/maria01/analytics',
   appPrefix: 'ngx-wayfinding-'
 };
