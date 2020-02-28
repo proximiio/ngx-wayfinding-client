@@ -28,7 +28,6 @@ app.get(Settings.basepath+'/token', function(request, response) {
 
 app.get(Settings.basepath+'/auth', async (request, response, next) => {
   const excludedAmenities = [
-    'fc4b12d0-9a8f-4bce-8e7e-807eb4952997',
     'e8e0b572-1465-4ba4-b9e5-21abf7ad2a80',
     '9957ee82-418c-45c3-ae99-fa43dd159aed',
     '300b2c33-d949-48b8-8504-570b70a680eb',
@@ -37,9 +36,7 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
     'c18a3a40-393a-4adc-b03b-15c48ed031d3',
     '87b69cb0-5240-4340-a73a-21c76fe52265',
     '0521e425-fbb4-426e-9ae8-d05e30dec80a',
-    '36acd710-5c5b-49ef-bb13-47435816c734',
-    'entrance',
-    'enntrance'
+    '36acd710-5c5b-49ef-bb13-47435816c734'
   ];
 
   try {
@@ -54,7 +51,7 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
       if (!feature.properties.title) {
         feature.properties.title = '';
       }
-      return !excludedAmenities.includes(feature.properties.amenity);
+      return !excludedAmenities.includes(feature.properties.amenity) || feature.id === '295b0c1d-3fac-4e2d-91fe-81cf9124e4ba:4f854565-6d70-4a6b-814d-2bde7e569e22';
     });
 
     const defaultLevel = config.data.default_floor_number ? config.data.default_floor_number : 0;
