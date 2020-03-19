@@ -46,6 +46,14 @@
       <fa-icon [icon]="['fal', 'toggle-on']" *ngIf="onlyAccessible" class="toggle-on" size="2x"></fa-icon>
     </button>
   </div>
+  <div *ngIf="showAdsToggle" style="margin-top: 1rem;">
+    <button type="button" class="accessible-btn" (click)="onShowAdsToggle()">
+      <fa-icon [icon]="['fal', 'ad']" size="lg"></fa-icon>
+      <span>Show Ads</span>
+      <fa-icon [icon]="['fal', 'toggle-off']" *ngIf="!showAds" class="toggle-off" size="2x"></fa-icon>
+      <fa-icon [icon]="['fal', 'toggle-on']" *ngIf="showAds" class="toggle-on" size="2x"></fa-icon>
+    </button>
+  </div>
   <div class="powered-by" *ngIf="showPoweredBy">
     <img src="assets/proximiio-logo-only.png" alt="Proximi.io">
     <h4 class="title">Powered by Proximi.io</h4>

@@ -5,6 +5,8 @@ import { MapRoutingModule } from './map-routing.module';
 import { NgxMapboxGLModule } from 'ngx-mapbox-gl';
 import { CoreModule } from '../core/core.module';
 import { FontawesomeModule } from '../fontawesome.module';
+import { AdDialogWindowComponent } from './ad-dialog-window/ad-dialog-window.component';
+import { AngularMaterialModule } from '../angular-material.module';
 
 @NgModule({
   imports: [
@@ -12,10 +14,15 @@ import { FontawesomeModule } from '../fontawesome.module';
     CoreModule,
     FontawesomeModule,
     MapRoutingModule,
+    AngularMaterialModule,
     NgxMapboxGLModule
   ],
   declarations: [
-    MapComponent
+    MapComponent,
+    AdDialogWindowComponent
+  ],
+  entryComponents: [
+    AdDialogWindowComponent
   ]
 })
 export class MapModule {}

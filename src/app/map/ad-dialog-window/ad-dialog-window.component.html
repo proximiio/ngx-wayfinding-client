@@ -1,0 +1,16 @@
+<mat-card class="example-card">
+  <mat-card-header>
+    <mat-card-title>{{ data.title }}</mat-card-title>
+    <mat-card-subtitle>{{ data.subtitle }}: {{ data.amount }}</mat-card-subtitle>
+  </mat-card-header>
+  <img mat-card-image [src]="data.image" [alt]="data.title">
+  <mat-card-content>
+    <p>
+      {{ data.content }}
+    </p>
+  </mat-card-content>
+  <mat-card-actions>
+    <a [href]="data.link" target="_blank" mat-button (click)="onCloseClick()">Take a look</a>
+    <button mat-raised-button color="warn" (click)="onCloseClick()">Close</button>
+  </mat-card-actions>
+</mat-card>

@@ -26,7 +26,9 @@ export class SidebarComponent implements OnInit {
   useCustomPois = false;
   customPois = [];
   showOnlyAccessibleToggle = true;
+  showAdsToggle = true;
   onlyAccessible = false;
+  showAds = true;
   showPoweredBy = false;
 
   constructor(
@@ -119,6 +121,11 @@ export class SidebarComponent implements OnInit {
   onAccessibleOnlyToggle() {
     this.onlyAccessible = !this.onlyAccessible;
     this.sidebarService.accessibleOnlyToggleListener.next(this.onlyAccessible);
+  }
+
+  onShowAdsToggle() {
+    this.showAds = !this.showAds;
+    this.sidebarService.showAdsToggleListener.next(this.showAds);
   }
 
 }

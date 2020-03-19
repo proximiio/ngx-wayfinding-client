@@ -44,7 +44,7 @@
         *ngFor="let ad of ads"
         [lngLat]="ad.coordinates">
         <div
-          (click)="onPopupClick(ad)"
+          (click)="onAdClick(ad)"
           class="marker offer-marker"
           [ngClass]="ad.type"
         >
