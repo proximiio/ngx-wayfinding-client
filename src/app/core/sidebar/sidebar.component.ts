@@ -25,9 +25,25 @@ export class SidebarComponent implements OnInit {
   placeSelectorLabel = 'Pick up a place';
   useCustomPois = false;
   customPois = [];
-  showOnlyAccessibleToggle = true;
+  showOnlyAccessibleToggle = false;
   onlyAccessible = false;
   showPoweredBy = false;
+  legendItems = [{
+    icon: ['fad', 'shopping-basket'],
+    color: '#4AD76F',
+    title: 'Ruokakaupat, joissa erityisaukiolo riskiryhmille',
+    active: true
+  }, {
+    icon: ['fad', 'burger-soda'],
+    color: '#FF3A84',
+    title: 'Ravintolat, joissa myydään noutoruokka',
+    active: true
+  }, {
+    icon: ['fad', 'map-marked-alt'],
+    color: '#3A4BB5',
+    title: 'Muu kohde',
+    active: true
+  }];
 
   constructor(
     private authService: AuthService,
@@ -119,6 +135,10 @@ export class SidebarComponent implements OnInit {
   onAccessibleOnlyToggle() {
     this.onlyAccessible = !this.onlyAccessible;
     this.sidebarService.accessibleOnlyToggleListener.next(this.onlyAccessible);
+  }
+
+  onLegendToggle(legend) {
+    legend.active = !legend.active;
   }
 
 }

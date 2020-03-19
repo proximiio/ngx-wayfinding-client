@@ -1,16 +1,31 @@
 <div class="sidebar">
-  <a href="javascript:;" (click)="sidebarService.closeSidebar();" *ngIf="sidebarService.sidenavMode === 'over'" class="close-sidebar">
-    <fa-icon [icon]="['fal', 'times']"></fa-icon>
-  </a>
   <div class="brand">
-    <img [src]="config.logo ? config.logo : 'assets/proximiio-logo-vertical.png'">
+    <h1>poikkeuskartta.fi</h1>
   </div>
-  <mat-form-field appearance="outline" *ngIf="showPlaceSelector">
-    <mat-label>{{ placeSelectorLabel }}</mat-label>
-    <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace" ></ng-select>
-    <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
-  </mat-form-field>
-  <mat-form-field appearance="outline">
+  <div class="place-selector">
+    <mat-form-field appearance="outline" *ngIf="showPlaceSelector">
+      <mat-label>{{ placeSelectorLabel }}</mat-label>
+      <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace" ></ng-select>
+      <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
+    </mat-form-field>
+  </div>
+  <div class="legend">
+    <mat-list>
+      <mat-list-item *ngFor="let legend of legendItems" (click)="onLegendToggle(legend);" [ngClass]="{'active': legend.active}">
+        <div class="icon" [style.backgroundColor]="legend.active ? legend.color : '#ccc'" matListIcon>
+          <fa-icon [icon]="legend.icon"></fa-icon>
+        </div>
+        <p matLine> {{ legend.title }} </p>
+        <mat-divider *ngIf="legend.title !== 'Muu kohde'"></mat-divider>
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div class="footer">
+    <p>Mitä kartalta puuttuu? Onko jokin tieto väärin? Laita viestiä <a href="mailto:kartta@proximi.io">kartta@proximi.io</a>, niin korjataan kuntoon!</p>
+
+    <p>Kartta päivitetty 19.3.2020</p>
+  </div>
+  <!--<mat-form-field appearance="outline">
     <mat-label>{{ endPointLabel }}</mat-label>
     <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
@@ -37,7 +52,7 @@
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>
-  </mat-form-field>
+  </mat-form-field>-->
   <div *ngIf="showOnlyAccessibleToggle">
     <button type="button" class="accessible-btn" (click)="onAccessibleOnlyToggle()">
       <fa-icon [icon]="['fal', 'wheelchair']" size="lg"></fa-icon>

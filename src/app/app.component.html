@@ -1,20 +1,14 @@
 <div [class]="'theme-wrapper ' + theme$">
-  <mat-sidenav-container *ngIf="userIsAuthenticated">
-    <mat-sidenav
-      [ngStyle]="{'background-color': currentUserConfig ? currentUserConfig.primary_color : ''}"
-      [mode]="sidebarService.sidenavMode"
-      [opened]="sidenavIsOpened"
-      #appDrawer>
-      <app-sidebar></app-sidebar>
-    </mat-sidenav>
-    <mat-sidenav-content>
-      <div class="container">
-        <div class="content">
-          <router-outlet #o="outlet"></router-outlet>
-        </div>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+  <ng-container *ngIf="userIsAuthenticated">
+    <app-sidebar></app-sidebar>
+    <div class="content">
+      <router-outlet #o="outlet"></router-outlet>
+    </div>
+    <div class="credits">
+      <img src="assets/proximiio-logo-only.png" alt="Proximi.io">
+      Kartan tuottanut Proximi.io - <a href="https://proximi.io" target="_blank">https://proximi.io</a>
+    </div>
+  </ng-container>
   <ng-container *ngIf="!userIsAuthenticated">
     <div class="content">
       <p *ngIf="isLoading" style="margin: 2rem 0; text-align: center;">

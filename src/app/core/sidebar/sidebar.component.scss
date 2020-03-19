@@ -1,16 +1,72 @@
 .sidebar {
-  padding: 0 1rem 1rem;
+  height: 579px;
+  overflow: auto;
 
   .brand {
-    background-color: white;
-    padding: 20px 10px;
-    width: 120px;
-    border-radius: 0 0 6px 6px;
-    margin-bottom: 2rem;
+    background-color: #3A4BB5;
+    padding: 2.5rem 2rem 0;
 
-    img {
-      width: 100%;
+    h1 {
+      color: white;
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: 24px;
+      margin: 0;
     }
+  }
+
+  .place-selector {
+    background-color: #3A4BB5;
+    padding: 1rem 2rem;
+  }
+
+  .legend {
+    .mat-list {
+      .mat-list-item {
+        height: 76px;
+        cursor: pointer;
+
+        &:hover {
+          .mat-line {
+            color: #3A4BB5;
+          }
+        }
+        &.active {
+          .mat-line {
+            color: black;
+          }
+          &:hover {
+            .mat-line {
+              color: #3A4BB5;
+            }
+          }
+        }
+        .icon {
+          width: 40px;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          border-radius: 50px;
+        }
+        .mat-line {
+          font-size: 14px;
+          color: #6f6f6f;
+        }
+        .mat-divider {
+          left: 1rem;
+          width: 385px;
+          background-color: rgba(0,0,0,.25);
+        }
+      }
+    }
+  }
+
+  .footer {
+    background: rgba(0,0,0,.1);
+    border-radius: 0 0 8px 8px;
+    padding: 1rem;
+    font-size: 13px;
+    margin: 2rem 5px 5px;
   }
 
   .close-sidebar {
@@ -37,6 +93,10 @@
 
   .mat-form-field {
     width: 100%;
+
+    ::ng-deep .mat-form-field-prefix {
+      color: white;
+    }
   }
 
   ::ng-deep .ng-option {

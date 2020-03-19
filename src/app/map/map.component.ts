@@ -7,7 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import * as Constants from './constants';
 import { MapLayerMouseEvent } from 'mapbox-gl';
 
-const GEO_API_ROOT = 'https://api.proximi.fi/v4/geo';
+const GEO_API_ROOT = 'https://api.proximi.fi/v5/geo';
 
 @Component({
   selector: 'app-map',
@@ -131,8 +131,12 @@ export class MapComponent implements OnInit, OnDestroy {
       this.config.point_of_origin.lng ?
         [this.config.point_of_origin.lng, this.config.point_of_origin.lat] :
         this.selectedPlace ? [this.selectedPlace.location.lng, this.selectedPlace.location.lat] : [0, 0];
+
     this.mapCenter = center;
     this.mapStyle = this.styleURL;
+
+    console.log(this.mapStyle);
+
     if (!this.mapMovingMethod) {
       this.mapMovingMethod = 'flyTo';
     }
@@ -426,10 +430,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
       this.mapCenter = path.geometry.coordinates[0];
       this.mapZoom = [19];
-
-      if (this.sidebarService.sidenavMode === 'over') {
-        this.sidebarService.closeSidebar();
-      }
     }
   }
 

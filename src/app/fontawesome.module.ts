@@ -6,8 +6,13 @@ import {
   faChevronDown,
   faSearch,
   faDotCircle,
-  faEllipsisVAlt, faEllipsisH, faEllipsisV, faTimesCircle, faTimes, faSearchLocation, faMapMarkerAlt, faWheelchair, faToggleOn, faToggleOff
+  faEllipsisVAlt, faEllipsisH, faEllipsisV, faTimesCircle, faTimes, faSearchLocation, faMapMarkerAlt, faWheelchair, faToggleOn, faToggleOff,
 } from '../vendor/pro-light-svg-icons';
+
+import {
+  faShoppingBasket,
+  faBurgerSoda, faMapMarkedAlt
+} from '../vendor/pro-duotone-svg-icons';
 
 @NgModule({
   exports: [
@@ -31,7 +36,10 @@ export class FontawesomeModule {
       faMapMarkerAlt,
       faWheelchair,
       faToggleOff,
-      faToggleOn
+      faToggleOn,
+      faShoppingBasket,
+      faBurgerSoda,
+      faMapMarkedAlt
     );
   }
 }

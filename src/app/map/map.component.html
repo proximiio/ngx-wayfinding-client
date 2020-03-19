@@ -1,28 +1,5 @@
 <div (resized)="onResized($event)">
-  <a href="javascript:;" (click)="sidebarService.toggleSidebar();" class="toggle-sidebar">
-    <fa-icon [icon]="['fal', 'ellipsis-v']" size="lg"></fa-icon>
-  </a>
-  <div class="map-floors">
-    <ul>
-      <li>
-        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'up'">{{ currentLevelChanger.nextLevel }}</span>
-        <a href="javascript:;"
-           [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'up'}"
-           (click)="onFloorChange('up', currentLevelChanger)">
-          <fa-icon [icon]="['fal', 'chevron-up']"></fa-icon>
-        </a>
-      </li>
-      <li class="current-floor">{{ selectedFloor ? selectedFloor.level : 0 }}</li>
-      <li>
-        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'down'">{{ currentLevelChanger.nextLevel }}</span>
-        <a href="javascript:;"
-           [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'down'}"
-           (click)="onFloorChange('down', currentLevelChanger)">
-          <fa-icon [icon]="['fal', 'chevron-down']"></fa-icon>
-        </a>
-      </li>
-    </ul>
-  </div>
+
   <mgl-map
     [style]="mapStyle"
     [zoom]="mapZoom"

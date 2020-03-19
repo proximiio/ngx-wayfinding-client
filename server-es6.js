@@ -44,7 +44,7 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
 
     const defaultLevel = config.data.default_floor_number ? config.data.default_floor_number : 0;
     const defaultFloor = floors.data.filter(floor => floor.level === defaultLevel)[0];
-    const defaultPlace = places.data.filter(place => place.id === defaultFloor.place_id)[0];
+    const defaultPlace = defaultFloor ? places.data.filter(place => place.id === defaultFloor.place_id)[0] : places.data.filter(place => place.name === 'Helsinki')[0];
 
     response.send({
       user: currentUser.data,
