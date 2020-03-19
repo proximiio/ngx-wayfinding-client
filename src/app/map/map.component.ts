@@ -86,6 +86,8 @@ export class MapComponent implements OnInit, OnDestroy {
     features: []
   };
   accessibleOnly = false;
+  showAds = true;
+  ads = [];
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -107,6 +109,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.setFloor(this.currentUserData.defaultFloor);
     this.selectedPlace = this.currentUserData.defaultPlace;
     this.showRaster = this.config.show_floorplans ? this.config.show_floorplans : true;
+    this.ads = this.currentUserData.ads;
 
     this.amenityMap = this.amenities.reduce((acc, item) => {
       if (item.icon && item.icon.match(/data:image/)) {
@@ -540,6 +543,10 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  onPopupClick(ad) {
+    console.log(ad);
   }
 
   private centerizeMap(location, zoom) {

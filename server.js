@@ -36,6 +36,34 @@ app.get(Settings.basepath+'/auth', async (function(request, response, next) {
     const places = await (proximiApiInstance.get(`/core/places`));
     const features = await (proximiApiInstance.get(`/v4/geo/features`));
     const amenities = await (proximiApiInstance.get(`/v4/geo/amenities`));
+    const ads = [{
+      feature_id: 'cf45a839-9a62-4cbb-8db5-9c5390d517d6:a56ba816-a03c-4855-9858-78585d74fe6c',
+      coordinates: [24.883181030680845, 60.1536962787558],
+      type: 'discount',
+      amount: '-50%',
+      title: 'bananas ad title',
+      content: 'ad content',
+      image: 'http://image.com',
+      link: 'http://link.com'
+    }, {
+      feature_id: 'cf45a839-9a62-4cbb-8db5-9c5390d517d6:0538d8a7-7ff8-4d65-bbe2-a944ed55a803',
+      coordinates: [24.883519153142657, 60.15385391598744],
+      type: 'special_price',
+      amount: '62€',
+      title: 'doggo food ad title',
+      content: 'ad content',
+      image: 'http://image.com',
+      link: 'http://link.com'
+    }, {
+      feature_id: 'cf45a839-9a62-4cbb-8db5-9c5390d517d6:a013a44b-48b6-441e-ba70-44c3907635a0',
+      coordinates: [24.883982826687514, 60.153783661515405],
+      type: 'discount',
+      amount: '-20%',
+      title: 'baguette ad title',
+      content: 'ad content',
+      image: 'http://image.com',
+      link: 'http://link.com'
+    }];
 
     features.data.features = features.data.features.map(feature => {
       if (!feature.properties.title) {
@@ -56,6 +84,7 @@ app.get(Settings.basepath+'/auth', async (function(request, response, next) {
         places: places.data,
         features: features.data,
         amenities: amenities.data,
+        ads: ads,
         defaultFloor: defaultFloor,
         defaultPlace: defaultPlace
       }

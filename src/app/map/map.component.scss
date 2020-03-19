@@ -17,6 +17,58 @@ mgl-map {
   ::ng-deep .mapboxgl-map {
     min-height: 320px;
   }
+
+  .offer-marker {
+    .label {
+      background: #219AA3;
+      background-clip: padding-box;
+      top: -52px;
+      left: -5px;
+      text-align: center;
+      color: #fff;
+      display: block;
+      padding: 1px 15px 1px 15px;
+      position: absolute;
+      -moz-user-select: none;
+      white-space: nowrap;
+      z-index: 2;
+
+      &:after,
+      &:before {
+        content: '';
+        position: absolute;
+        height: 0;
+        border-style: solid;
+      }
+
+      &:before {
+        width: 10px;
+        right: -10px;
+        top: 0;
+        border-width: 11px 4px;
+        border-color: #219AA3 transparent #219AA3 #219AA3;
+      }
+
+      &:after {
+        width: 0;
+        left: 0;
+        top: 100%;
+        border-width: 4px 4px;
+        border-color: #145e63 #145e63 transparent transparent;
+      }
+    }
+    &.special_price {
+      .label {
+        background: #e29827;
+        &:before {
+          border-color: #e29827 transparent #e29827 #e29827;
+        }
+        &:after {
+          border-color: #ac741e #ac741e transparent transparent;
+        }
+      }
+    }
+  }
 }
 
 .map-floors {
