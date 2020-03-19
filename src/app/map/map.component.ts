@@ -6,6 +6,8 @@ import along from '@turf/along';
 import { AuthService } from '../auth/auth.service';
 import * as Constants from './constants';
 import { MapLayerMouseEvent } from 'mapbox-gl';
+import { AdDialogWindowComponent } from './ad-dialog-window/ad-dialog-window.component';
+import { MatDialog } from '@angular/material/dialog';
 
 const GEO_API_ROOT = 'https://api.proximi.fi/v4/geo';
 
@@ -86,13 +88,16 @@ export class MapComponent implements OnInit, OnDestroy {
     features: []
   };
   accessibleOnly = false;
+  showAds = true;
+  ads = [];
   @Input() mapMovingMethod: string;
   private subs = [];
 
   constructor(
     private mapService: MapService,
     private authService: AuthService,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    public dialog: MatDialog
   ) {
     this.currentUser = this.authService.getCurrentUser();
     this.config = this.authService.getCurrentUserConfig();
@@ -107,6 +112,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.setFloor(this.currentUserData.defaultFloor);
     this.selectedPlace = this.currentUserData.defaultPlace;
     this.showRaster = this.config.show_floorplans ? this.config.show_floorplans : true;
+    this.ads = this.currentUserData.ads;
 
     this.amenityMap = this.amenities.reduce((acc, item) => {
       if (item.icon && item.icon.match(/data:image/)) {
@@ -166,6 +172,9 @@ export class MapComponent implements OnInit, OnDestroy {
       this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
         this.accessibleOnly = accessibleOnly;
         this.generateRoute();
+      }),
+      this.sidebarService.getShowAdsToggleListener().subscribe(showAds => {
+        this.showAds = showAds;
       }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
         this.setPlace(place);
@@ -540,6 +549,15 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  onAdClick(ad) {
+    console.log(ad);
+    const dialogRef = this.dialog.open(AdDialogWindowComponent, {
+      width: '360px',
+      data: ad,
+      panelClass: 'dialog-transparent'
+    });
   }
 
   private centerizeMap(location, zoom) {

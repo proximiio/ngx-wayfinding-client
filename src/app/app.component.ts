@@ -5,7 +5,8 @@ import { SidebarService } from './core/sidebar/sidebar.service';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import Fingerprint2 from 'fingerprintjs2';
-import { AhoyService } from './core/ahoy.service';
+import ahoy from 'ahoy.js';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -19,21 +20,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   theme$ = 'default-theme';
   currentUserConfig;
-  sendAnalytics = false;
+  fingerprint;
+  sendAnalytics = true;
   private authListenerSubs: Subscription;
 
   constructor(
     public sidebarService: SidebarService,
     private authService: AuthService,
     private breakpointObserver: BreakpointObserver,
-    private ahoyService: AhoyService,
     overlayContainer: OverlayContainer
   ) {
     overlayContainer.getContainerElement().classList.add(this.theme$);
-    /*Fingerprint2.get((fingerprint) => {
-      console.log(fingerprint);
-    });
-    this.ahoyService.getInstance().debug();*/
   }
 
   ngOnInit(): void {
@@ -75,7 +72,31 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   startAhoyTracking() {
     if (this.sendAnalytics) {
-      this.ahoyService.getInstance().trackAll();
+      const options = {
+        excludes: {
+          canvas: true,
+          webgl: true
+        }
+      };
+      Fingerprint2.get(options, (fingerprint) => {
+        this.fingerprint = fingerprint;
+        ahoy.configure({
+          urlPrefix: '',
+          visitsUrl: `${environment.ahoyUrl}/ahoy/visits`,
+          eventsUrl: `${environment.ahoyUrl}/ahoy/events`,
+          page: null,
+          platform: 'Web',
+          useBeacon: true,
+          startOnReady: true,
+          trackVisits: true,
+          cookies: true,
+          cookieDomain: null,
+          headers: {'Authorization': `Bearer ${this.authService.getToken()}`},
+          visitParams: {fingerprint: fingerprint},
+          withCredentials: false
+        });
+        ahoy.trackAll();
+      });
     }
   }
 

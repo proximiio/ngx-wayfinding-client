@@ -34,6 +34,37 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
     const places = await proximiApiInstance.get(`/core/places`);
     const features = await proximiApiInstance.get(`/v4/geo/features`);
     const amenities = await proximiApiInstance.get(`/v4/geo/amenities`);
+    const ads = [{
+      feature_id: 'cf45a839-9a62-4cbb-8db5-9c5390d517d6:a56ba816-a03c-4855-9858-78585d74fe6c',
+      coordinates: [24.883181030680845, 60.1536962787558],
+      type: 'discount',
+      amount: '-50%',
+      title: 'Buy 2 bananas for a price of 1',
+      subtitle: 'Discount',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      image: 'https://cdn.pixabay.com/photo/2015/03/30/12/43/bananas-698608_960_720.jpg',
+      link: 'https://merch.sk/naked-bananas'
+    }, {
+      feature_id: 'cf45a839-9a62-4cbb-8db5-9c5390d517d6:0538d8a7-7ff8-4d65-bbe2-a944ed55a803',
+      coordinates: [24.883519153142657, 60.15385391598744],
+      type: 'special_price',
+      amount: '62€',
+      title: 'Doggo Food for a special price',
+      subtitle: 'Special Offer',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      image: 'https://cdn.pixabay.com/photo/2014/05/21/18/08/dog-bones-350092_960_720.jpg',
+      link: 'https://barfer.sk/'
+    }, {
+      feature_id: 'cf45a839-9a62-4cbb-8db5-9c5390d517d6:a013a44b-48b6-441e-ba70-44c3907635a0',
+      coordinates: [24.883982826687514, 60.153783661515405],
+      type: 'discount',
+      amount: '-20%',
+      title: 'Baguette ala france in a discount!',
+      subtitle: 'Discount',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      image: 'https://cdn.pixabay.com/photo/2016/10/22/17/10/bread-1761197_960_720.jpg',
+      link: 'http://www.pierrebaguette.eu/'
+    }];
 
     features.data.features = features.data.features.map(feature => {
       if (!feature.properties.title) {
@@ -54,6 +85,7 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
         places: places.data,
         features: features.data,
         amenities: amenities.data,
+        ads: ads,
         defaultFloor: defaultFloor,
         defaultPlace: defaultPlace
       }
@@ -63,8 +95,32 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
   }
 });
 
-app.get(Settings.basepath+'/*',(req,res) =>{
+app.get(Settings.basepath+'/*',(req,res) => {
   res.sendFile(path.join(__dirname,'dist/ngx-wayfinding-client/index.html'));
+});
+
+app.post(Settings.basepath+'/analytics/ahoy/visits', function(request, res) {
+  const data = request.body;
+  data.type = 'ahoy-visit';
+  proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
+    res.send(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+    res.send(response.data);
+  });
+});
+
+app.post(Settings.basepath+'/analytics/ahoy/events', function(request, res) {
+  const data = request.body;
+  data.type = 'ahoy-event';
+  proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
+    res.send(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+    res.send(error);
+  });
 });
 
 const server = http.createServer(app);

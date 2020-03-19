@@ -10,6 +10,7 @@ export class SidebarService {
   public endPointListener = new Subject<any>();
   public selectedPlaceListener = new Subject<any>();
   public accessibleOnlyToggleListener = new Subject<boolean>();
+  public showAdsToggleListener = new Subject<boolean>();
 
   constructor() {}
 
@@ -46,5 +47,9 @@ export class SidebarService {
 
   getAccessibleOnlyToggleListener() {
     return this.accessibleOnlyToggleListener.asObservable();
+  }
+
+  getShowAdsToggleListener() {
+    return this.showAdsToggleListener.asObservable();
   }
 }

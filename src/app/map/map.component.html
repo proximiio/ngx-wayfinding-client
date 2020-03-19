@@ -39,6 +39,21 @@
       >
       </mgl-image>
     </ng-container>
+    <ng-container *ngIf="showAds">
+      <mgl-marker
+        *ngFor="let ad of ads"
+        [lngLat]="ad.coordinates">
+        <div
+          (click)="onAdClick(ad)"
+          class="marker offer-marker"
+          [ngClass]="ad.type"
+        >
+          <div class="label">
+            {{ ad.amount }}
+          </div>
+        </div>
+      </mgl-marker>
+    </ng-container>
     <mgl-geojson-source
       [id]="Constants.SOURCE_POI"
       [data]="featuresForLevel(level, true)"
