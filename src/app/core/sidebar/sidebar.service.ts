@@ -7,6 +7,7 @@ export class SidebarService {
   public startPointListener = new Subject<any>();
   public endPointListener = new Subject<any>();
   public selectedPlaceListener = new Subject<any>();
+  public legendToggleListener = new Subject<any>();
   public accessibleOnlyToggleListener = new Subject<boolean>();
 
   constructor() {}
@@ -25,6 +26,10 @@ export class SidebarService {
 
   getSelectedPlaceListener() {
     return this.selectedPlaceListener.asObservable();
+  }
+
+  getLegendToggleListener() {
+    return this.legendToggleListener.asObservable();
   }
 
   getAccessibleOnlyToggleListener() {

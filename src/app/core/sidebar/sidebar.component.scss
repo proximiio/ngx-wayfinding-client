@@ -1,5 +1,5 @@
 .sidebar {
-  height: 579px;
+  height: 100%;
   overflow: auto;
 
   .brand {
@@ -47,6 +47,10 @@
           line-height: 40px;
           text-align: center;
           border-radius: 50px;
+        }
+        .amenity-image {
+          width: 48px;
+          height: 48px;
         }
         .mat-line {
           font-size: 14px;

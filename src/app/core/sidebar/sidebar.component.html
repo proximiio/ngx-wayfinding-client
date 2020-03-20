@@ -12,7 +12,8 @@
   <div class="legend">
     <mat-list>
       <mat-list-item *ngFor="let legend of legendItems" (click)="onLegendToggle(legend);" [ngClass]="{'active': legend.active}">
-        <div class="icon" [style.backgroundColor]="legend.active ? legend.color : '#ccc'" matListIcon>
+        <img [src]="legend.amenity_image" [alt]="legend.title" *ngIf="legend.amenity_image" matListIcon class="amenity-image">
+        <div class="icon" [style.backgroundColor]="legend.active ? legend.color : '#ccc'" matListIcon *ngIf="!legend.amenity_image">
           <fa-icon [icon]="legend.icon"></fa-icon>
         </div>
         <p matLine> {{ legend.title }} </p>
