@@ -55,3 +55,12 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+.dialog-transparent {
+  .mat-dialog-container {
+    background: transparent!important;
+    box-shadow: none!important;
+    height: 100vh;
+    overflow: auto;
+  }
+}

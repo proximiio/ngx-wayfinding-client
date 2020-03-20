@@ -1,11 +1,13 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MapService } from './map.service';
 import { SidebarService } from '../core/sidebar/sidebar.service';
 import { ResizedEvent } from 'angular-resize-event';
 import along from '@turf/along';
 import { AuthService } from '../auth/auth.service';
 import * as Constants from './constants';
-import { MapLayerMouseEvent } from 'mapbox-gl';
+import { MapboxGeoJSONFeature, MapLayerMouseEvent } from 'mapbox-gl';
+import { PoiDetailsDialogComponent } from './poi-details-dialog/poi-details-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 const GEO_API_ROOT = 'https://api.proximi.fi/v5/geo';
 
@@ -46,14 +48,15 @@ export class MapComponent implements OnInit, OnDestroy {
   font = 'Klokantech Noto Sans Regular';
   objectKeys = Object.keys;
   accessibleOnly = false;
-  selectedPoi;
   @Input() mapMovingMethod: string;
   private subs = [];
 
   constructor(
     private mapService: MapService,
     private authService: AuthService,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    private dialog: MatDialog,
+    private zone: NgZone
   ) {
     this.currentUser = this.authService.getCurrentUser();
     this.config = this.authService.getCurrentUserConfig();
@@ -89,8 +92,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.mapCenter = center;
     this.mapStyle = this.styleURL;
 
-    console.log(this.mapStyle);
-
     if (!this.mapMovingMethod) {
       this.mapMovingMethod = 'flyTo';
     }
@@ -107,7 +108,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.setPlace(place);
       }),
       this.sidebarService.getLegendToggleListener().subscribe(legend => {
-        this.togglePoiVisibility(legend);
+        // this.togglePoiVisibility(legend);
       })
     );
   }
@@ -158,41 +159,32 @@ export class MapComponent implements OnInit, OnDestroy {
     this.mapCenter = [this.selectedPlace.location.lng, this.selectedPlace.location.lat];
   }
 
-  onPoiClick(poi) {
-    this.selectedPoi = poi;
-    console.log(this.selectedPoi);
-  }
-
   onLoad(map) {
     this.map = map;
     this.refreshLayers();
     this.mapLoaded.emit(true);
     this.map.resize();
     this.isLoaded = true;
-    this.subs.push(
-      this.sidebarService.getSidebarStatusListener().subscribe(() => {
-        if (this.map) {
-          setTimeout(() => {
-            this.map.resize();
-          }, 500);
-        }
-      })
-    );
 
-    // When a click event occurs on a feature in the pois layer, open a popup at the
-    // location of the feature, with description HTML from its properties.
-    this.map.on('click', 'pois-icons', e => {
-      this.onPoiClick(e.features[0]);
+    map.on('click', 'pois-icons', (e: MapLayerMouseEvent) => {
+      const poi = e.features[0];
+      this.zone.run(() => {
+        this.dialog.open(PoiDetailsDialogComponent, {
+          width: '420px',
+          data: poi,
+          panelClass: 'dialog-transparent'
+        });
+      });
     });
 
     // Change the cursor to a pointer when the mouse is over the pois layer.
-    this.map.on('mouseenter', 'pois-icons', () => {
-      this.map.getCanvas().style.cursor = 'pointer';
+    map.on('mouseenter', 'pois-icons', () => {
+      map.getCanvas().style.cursor = 'pointer';
     });
 
     // Change it back to a pointer when it leaves.
-    this.map.on('mouseleave', 'pois-icons', () => {
-      this.map.getCanvas().style.cursor = '';
+    map.on('mouseleave', 'pois-icons', () => {
+      map.getCanvas().style.cursor = '';
     });
   }
 

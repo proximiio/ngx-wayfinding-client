@@ -1,0 +1,26 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ poi.properties.title }}</mat-card-title>
+    <mat-card-subtitle>{{ metadata?.description?.fi }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let item of metadata?.openHours | keyvalue">
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <ng-container [ngSwitch]="item.key">
+          <strong *ngSwitchCase="0">Ma:</strong>
+          <strong *ngSwitchCase="1">Ti:</strong>
+          <strong *ngSwitchCase="2">Ke:</strong>
+          <strong *ngSwitchCase="3">To:</strong>
+          <strong *ngSwitchCase="4">Pe:</strong>
+          <strong *ngSwitchCase="5">La:</strong>
+          <strong *ngSwitchCase="6">Su:</strong>
+        </ng-container>
+        <span>{{ item.value.fi }}</span>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="warn" (click)="onCloseClick()">Sulje</button>
+  </mat-card-actions>
+</mat-card>

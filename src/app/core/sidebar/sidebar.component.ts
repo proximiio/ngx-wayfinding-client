@@ -22,7 +22,7 @@ export class SidebarComponent implements OnInit {
   showPlaceSelector = true;
   endPointLabel = 'What are you looking for?';
   startPointLabel = 'Where are you now?';
-  placeSelectorLabel = 'Pick up a place';
+  placeSelectorLabel = 'Valitse kaupunki';
   useCustomPois = false;
   customPois = [];
   showOnlyAccessibleToggle = false;
@@ -30,21 +30,21 @@ export class SidebarComponent implements OnInit {
   showPoweredBy = false;
   legendItems = [{
     icon: ['fad', 'shopping-basket'],
-    amenity_image: null,
+    amenity_image: 'assets/amenity-ruoka.png',
     amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:e46d943a-2110-4ed3-a547-76abbba4509b',
     color: '#4AD76F',
     title: 'Ruokakaupat, joissa erityisaukiolo riskiryhmille',
     active: true
   }, {
     icon: ['fad', 'burger-soda'],
-    amenity_image: null,
+    amenity_image: 'assets/lataus_3.png',
     amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:4f1aea09-1f5f-4084-b601-dac77ba397d1',
     color: '#FF3A84',
     title: 'Ravintolat, joissa myydään noutoruokka',
     active: true
   }, {
     icon: ['fad', 'map-marked-alt'],
-    amenity_image: null,
+    amenity_image: 'assets/amenity-muu.png',
     amenity_id: null,
     color: '#3A4BB5',
     title: 'Muu kohde',
@@ -67,7 +67,7 @@ export class SidebarComponent implements OnInit {
     this.amenities = this.currentUserData.amenities;
     this.onlyAccessible = this.config.accessible_only ? this.config.accessible_only : false;
     this.legendItems.map(item => {
-      if (item.amenity_id) {
+      if (item.amenity_id && !item.amenity_image) {
         item.amenity_image = this.amenities.find(amenity => amenity.id === item.amenity_id).icon;
       }
       return item;

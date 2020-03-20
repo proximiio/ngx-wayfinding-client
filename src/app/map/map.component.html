@@ -14,11 +14,5 @@
       >
       </mgl-image>
     </ng-container>
-    <ng-container>
-      <mgl-popup [lngLat]="selectedPoi ? selectedPoi.geometry.coordinates : [0,0]">
-        {{ selectedPoi?.properties?.title }}
-        <!--<span [innerHTML]="selectedPoi.properties?.metadata"></span>-->
-      </mgl-popup>
-    </ng-container>
   </mgl-map>
 </div>

@@ -35,7 +35,7 @@ $default-palette: (
 // mat-palette accepts $palette-name, main, lighter and darker variants
 $default-theme-primary: mat-palette($default-palette, A100, 300, 900);
 $default-theme-accent: mat-palette($mat-light-blue);
-$default-theme-warn: mat-palette($default-palette);
+$default-theme-warn: mat-palette($mat-pink);
 
 // create theme (use mat-dark-theme for themes with dark backgrounds)
 $default-theme: mat-dark-theme(

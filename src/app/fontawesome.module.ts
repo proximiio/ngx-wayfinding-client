@@ -11,7 +11,7 @@ import {
 
 import {
   faShoppingBasket,
-  faBurgerSoda, faMapMarkedAlt
+  faBurgerSoda, faMapMarkedAlt, faClock
 } from '../vendor/pro-duotone-svg-icons';
 
 @NgModule({
@@ -39,7 +39,8 @@ export class FontawesomeModule {
       faToggleOn,
       faShoppingBasket,
       faBurgerSoda,
-      faMapMarkedAlt
+      faMapMarkedAlt,
+      faClock
     );
   }
 }
