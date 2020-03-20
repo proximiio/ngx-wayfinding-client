@@ -45,9 +45,16 @@ export class SidebarComponent implements OnInit {
   }, {
     icon: ['fad', 'map-marked-alt'],
     amenity_image: 'assets/amenity-muu.png',
-    amenity_id: null,
+    amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:69324ddd-e5f7-4c80-8e04-84bee3b41894',
     color: '#3A4BB5',
     title: 'Muu kohde',
+    active: true
+  }, {
+    icon: null,
+    amenity_image: null,
+    amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:249f80f2-b14d-4571-b2d2-cae37d4509b3',
+    color: '#3A4BB5',
+    title: 'S-ryhmä',
     active: true
   }];
 
@@ -150,8 +157,8 @@ export class SidebarComponent implements OnInit {
   }
 
   onLegendToggle(legend) {
-    // legend.active = !legend.active;
-    // this.sidebarService.legendToggleListener.next(legend);
+    legend.active = !legend.active;
+    this.sidebarService.legendToggleListener.next(legend);
   }
 
 }

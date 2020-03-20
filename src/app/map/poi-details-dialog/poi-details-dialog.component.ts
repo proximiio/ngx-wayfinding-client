@@ -12,11 +12,12 @@ export class PoiDetailsDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<PoiDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public poi: any
-  ) { }
+  ) {
+    console.log(this.poi);
+  }
 
   ngOnInit() {
     this.metadata = JSON.parse(this.poi.properties.metadata);
-    console.log(this.metadata);
   }
 
   onCloseClick(): void {

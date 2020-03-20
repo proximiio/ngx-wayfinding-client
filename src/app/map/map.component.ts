@@ -64,7 +64,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.places = this.currentUserData.places;
     this.floors = this.currentUserData.floors;
     this.features = this.currentUserData.features;
-    this.filteredFeatures = [...this.features.features];
+    this.filteredFeatures = {...this.features};
     this.amenities = this.currentUserData.amenities;
     this.level = this.config.default_floor_number ? this.config.default_floor_number : 0;
     this.accessibleOnly = this.config.accessible_only ? this.config.accessible_only : false;
@@ -108,7 +108,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.setPlace(place);
       }),
       this.sidebarService.getLegendToggleListener().subscribe(legend => {
-        // this.togglePoiVisibility(legend);
+        this.togglePoiVisibility(legend);
       })
     );
   }
@@ -190,13 +190,21 @@ export class MapComponent implements OnInit, OnDestroy {
 
   refreshLayers() {
     if (this.map) {
-      this.map.getSource('main').setData(this.features);
-      this.map.getSource('clusters').setData(this.features);
+      this.map.getSource('main').setData(this.filteredFeatures);
+      this.map.getSource('clusters').setData(this.filteredFeatures);
     }
   }
 
   togglePoiVisibility(legend) {
-    if (this.map) {
+    if (!legend.active) {
+      this.filteredFeatures['features'] = this.filteredFeatures['features'].filter(i => i.properties.amenity !== legend.amenity_id);
+      this.refreshLayers();
+    } else {
+      const amenityFeatures = [...this.features['features'].filter(i => i.properties.amenity === legend.amenity_id)];
+      this.filteredFeatures['features'] = this.filteredFeatures['features'].concat(amenityFeatures);
+      this.refreshLayers();
+    }
+    /*if (this.map) {
       const layers = this.map.getStyle().layers;
       layers.forEach(l => {
         const layer = this.map.getLayer(l.id);
@@ -212,7 +220,7 @@ export class MapComponent implements OnInit, OnDestroy {
           this.map.setFilter(l.id, filterArray);
         }
       });
-    }
+    }*/
   }
 
   private centerizeMap(location, zoom) {
