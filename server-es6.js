@@ -39,6 +39,9 @@ app.get(Settings.basepath+'/auth', async (request, response, next) => {
       if (!feature.properties.title) {
         feature.properties.title = '';
       }
+      if (feature.properties.amenity) {
+        feature.properties.category_id = amenities.data.find(i => i.id === feature.properties.amenity).category;
+      }
       return feature;
     });
 

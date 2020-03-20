@@ -197,10 +197,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
   togglePoiVisibility(legend) {
     if (!legend.active) {
-      this.filteredFeatures['features'] = this.filteredFeatures['features'].filter(i => i.properties.amenity !== legend.amenity_id);
+      this.filteredFeatures['features'] = this.filteredFeatures['features'].filter(i => i.properties.category_id !== legend.category_id);
       this.refreshLayers();
     } else {
-      const amenityFeatures = [...this.features['features'].filter(i => i.properties.amenity === legend.amenity_id)];
+      const amenityFeatures = [...this.features['features'].filter(i => i.properties.category_id === legend.category_id)];
       this.filteredFeatures['features'] = this.filteredFeatures['features'].concat(amenityFeatures);
       this.refreshLayers();
     }

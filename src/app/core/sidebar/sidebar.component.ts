@@ -32,6 +32,7 @@ export class SidebarComponent implements OnInit {
     icon: ['fad', 'shopping-basket'],
     amenity_image: 'assets/amenity-ruoka.png',
     amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:e46d943a-2110-4ed3-a547-76abbba4509b',
+    category_id: 'a8fd81da-c37d-48a1-aba8-4aa0b6b5660d',
     color: '#4AD76F',
     title: 'Ruokakaupat, joissa erityisaukiolo riskiryhmille',
     active: true
@@ -39,6 +40,7 @@ export class SidebarComponent implements OnInit {
     icon: ['fad', 'burger-soda'],
     amenity_image: 'assets/lataus_3.png',
     amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:4f1aea09-1f5f-4084-b601-dac77ba397d1',
+    category_id: '4cad57ad-f831-452d-a2dc-c5d3852d7e30',
     color: '#FF3A84',
     title: 'Ravintolat, joissa myydään noutoruokka',
     active: true
@@ -46,15 +48,9 @@ export class SidebarComponent implements OnInit {
     icon: ['fad', 'map-marked-alt'],
     amenity_image: 'assets/amenity-muu.png',
     amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:69324ddd-e5f7-4c80-8e04-84bee3b41894',
+    category_id: 'e3370183-cdc2-45e7-bc84-0fdff0f05028',
     color: '#3A4BB5',
     title: 'Muu kohde',
-    active: true
-  }, {
-    icon: null,
-    amenity_image: null,
-    amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:249f80f2-b14d-4571-b2d2-cae37d4509b3',
-    color: '#3A4BB5',
-    title: 'S-ryhmä',
     active: true
   }];
 
