@@ -1,10 +1,10 @@
 <div [class]="'theme-wrapper ' + theme$">
   <ng-container *ngIf="userIsAuthenticated">
-    <app-sidebar></app-sidebar>
+    <app-sidebar [ngClass]="{'sm': sidebarService.window === 'sm'}"></app-sidebar>
     <div class="content">
       <router-outlet #o="outlet"></router-outlet>
     </div>
-    <div class="credits">
+    <div class="credits" [ngClass]="{'sm': sidebarService.window === 'sm'}">
       <img src="assets/proximiio-logo-only.png" alt="Proximi.io">
       Kartan tuottanut Proximi.io - <a href="https://proximi.io" target="_blank">https://proximi.io</a>
     </div>

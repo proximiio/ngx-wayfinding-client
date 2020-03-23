@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { isPointWithinRadius } from 'geolib';
 import { AuthService } from '../../auth/auth.service';
 import { SidebarService } from './sidebar.service';
+import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-sidebar',
@@ -58,6 +59,7 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private breakpointObserver: BreakpointObserver,
     public sidebarService: SidebarService
   ) {
     this.currentUser = this.authService.getCurrentUser();
@@ -81,6 +83,15 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.pois = this.sortedPOIs;
+    this.breakpointObserver
+      .observe([Breakpoints.XSmall, Breakpoints.Small])
+      .subscribe((state: BreakpointState) => {
+        if (state.breakpoints['(max-width: 599.99px)'] || state.breakpoints['(min-width: 600px) and (max-width: 959.99px)']) {
+          this.panelOpenState = false;
+        } else if (!state.matches) {
+          this.panelOpenState = true;
+        }
+      });
   }
 
   get sortedPOIs() {

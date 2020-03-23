@@ -6,7 +6,17 @@ import {
   faChevronDown,
   faSearch,
   faDotCircle,
-  faEllipsisVAlt, faEllipsisH, faEllipsisV, faTimesCircle, faTimes, faSearchLocation, faMapMarkerAlt, faWheelchair, faToggleOn, faToggleOff,
+  faEllipsisVAlt,
+  faEllipsisH,
+  faEllipsisV,
+  faTimesCircle,
+  faTimes,
+  faSearchLocation,
+  faMapMarkerAlt,
+  faWheelchair,
+  faToggleOn,
+  faToggleOff,
+  faBars,
 } from '../vendor/pro-light-svg-icons';
 
 import {
@@ -40,7 +50,8 @@ export class FontawesomeModule {
       faShoppingBasket,
       faBurgerSoda,
       faMapMarkedAlt,
-      faClock
+      faClock,
+      faBars
     );
   }
 }

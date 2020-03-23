@@ -7,6 +7,8 @@
     [movingMethod]="mapMovingMethod"
     (load)="onLoad($event)"
   >
+    <mgl-control mglGeolocate [position]="sidebarService.window === 'lg' ? 'top-right' : 'bottom-right'"></mgl-control>
+    <mgl-control mglNavigation [position]="sidebarService.window === 'lg' ? 'top-right' : 'bottom-right'"></mgl-control>
     <ng-container *ngFor="let key of objectKeys(images)">
       <mgl-image
         [id]="key"

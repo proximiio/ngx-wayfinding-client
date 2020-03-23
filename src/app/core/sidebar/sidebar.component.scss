@@ -73,7 +73,7 @@
         }
         .mat-divider {
           left: 1rem;
-          width: 385px;
+          width: calc(100% - 2rem);
           background-color: rgba(0,0,0,.25);
         }
       }
@@ -85,7 +85,7 @@
     border-radius: 0 0 8px 8px;
     padding: 1rem;
     font-size: 13px;
-    margin: 2rem 5px 5px;
+    margin: 1rem 5px 5px;
   }
 
   .close-sidebar {
@@ -218,6 +218,38 @@
     .title {
       margin-top: 0;
       color: #333;
+    }
+  }
+}
+
+:host.sm {
+  .sidebar {
+    .brand {
+      padding: 1.5rem 1rem 0;
+      h1 {
+        font-size: 16px;
+      }
+      .menu-toggle {
+        float: right;
+        margin-top: -12px;
+      }
+    }
+    .place-selector {
+      padding: 1rem 1rem 0;
+    }
+    .legend {
+      .mat-list {
+        .mat-list-item {
+          height: 50px;
+          .amenity-image {
+            width: 28px;
+            height: 28px;
+          }
+        }
+      }
+    }
+    .footer {
+      padding: .5rem;
     }
   }
 }

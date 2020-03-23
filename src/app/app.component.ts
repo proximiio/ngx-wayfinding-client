@@ -48,10 +48,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.breakpointObserver
       .observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe((state: BreakpointState) => {
-        if (state.breakpoints['(max-width: 599.99px)']) {
+        if (state.breakpoints['(max-width: 599.99px)'] || state.breakpoints['(min-width: 600px) and (max-width: 959.99px)']) {
           this.sidebarService.window = 'sm';
-        } else if (state.breakpoints['(min-width: 600px) and (max-width: 959.99px)']) {
-          this.sidebarService.window = 'md';
         } else if (!state.matches) {
           this.sidebarService.window = 'lg';
         }

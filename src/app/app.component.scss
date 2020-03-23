@@ -10,6 +10,15 @@ app-sidebar {
   overflow: hidden;
   height: calc(100% - 100px);
   max-height: 579px;
+
+  &.sm {
+    right: 10px;
+    left: 10px;
+    top: 10px;
+    width: auto;
+    height: auto;
+    max-height: none;
+  }
 }
 
 .content {
@@ -33,5 +42,15 @@ app-sidebar {
     height: 20px;
     margin-right: 1rem;
     vertical-align: middle;
+  }
+
+  &.sm {
+    left: 10px;
+    padding: .25rem .5rem;
+    font-size: 12px;
+
+    &.img {
+      height: 15px;
+    }
   }
 }

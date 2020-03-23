@@ -1,5 +1,8 @@
 <div class="sidebar">
   <div class="brand">
+    <button mat-mini-fab class="menu-toggle" color="primary" (click)="togglePanel()" *ngIf="sidebarService.window === 'sm'">
+      <fa-icon [icon]="['fal', 'bars']"></fa-icon>
+    </button>
     <h1>poikkeuskartta.fi</h1>
   </div>
   <div class="place-selector">
@@ -9,7 +12,7 @@
       <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
     </mat-form-field>
   </div>
-  <mat-expansion-panel [expanded]="panelOpenState">
+  <mat-expansion-panel [expanded]="panelOpenState || sidebarService.window === 'lg'">
     <div class="legend">
       <mat-list>
         <mat-list-item *ngFor="let legend of legendItems" (click)="onLegendToggle(legend);" [ngClass]="{'active': legend.active}">
