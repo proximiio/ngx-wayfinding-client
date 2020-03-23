@@ -42,7 +42,7 @@ export class SidebarComponent implements OnInit {
     amenity_id: 'bfddb33f-ba61-458b-a1ea-26f786c6ea9a:4f1aea09-1f5f-4084-b601-dac77ba397d1',
     category_id: '4cad57ad-f831-452d-a2dc-c5d3852d7e30',
     color: '#FF3A84',
-    title: 'Ravintolat, joissa myydään noutoruokka',
+    title: 'Ravintolat, joissa myydään noutoruokaa',
     active: true
   }, {
     icon: ['fad', 'map-marked-alt'],
@@ -53,6 +53,7 @@ export class SidebarComponent implements OnInit {
     title: 'Muu kohde',
     active: true
   }];
+  currentDate = new Date();
 
   constructor(
     private authService: AuthService,
