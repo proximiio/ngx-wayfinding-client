@@ -9,23 +9,25 @@
       <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
     </mat-form-field>
   </div>
-  <div class="legend">
-    <mat-list>
-      <mat-list-item *ngFor="let legend of legendItems" (click)="onLegendToggle(legend);" [ngClass]="{'active': legend.active}">
-        <img [src]="legend.amenity_image" [alt]="legend.title" *ngIf="legend.amenity_image" matListIcon class="amenity-image">
-        <div class="icon" [style.backgroundColor]="legend.active ? legend.color : '#ccc'" matListIcon *ngIf="!legend.amenity_image">
-          <fa-icon [icon]="legend.icon"></fa-icon>
-        </div>
-        <p matLine> {{ legend.title }} </p>
-        <mat-divider *ngIf="legend.title !== 'S-ryhmä'"></mat-divider>
-      </mat-list-item>
-    </mat-list>
-  </div>
-  <div class="footer">
-    <p>Mitä kartalta puuttuu? Onko jokin tieto väärin? Laita viestiä <a href="mailto:kartta@proximi.io">kartta@proximi.io</a>, niin korjataan kuntoon!</p>
+  <mat-expansion-panel [expanded]="panelOpenState">
+    <div class="legend">
+      <mat-list>
+        <mat-list-item *ngFor="let legend of legendItems" (click)="onLegendToggle(legend);" [ngClass]="{'active': legend.active}">
+          <img [src]="legend.amenity_image" [alt]="legend.title" *ngIf="legend.amenity_image" matListIcon class="amenity-image">
+          <div class="icon" [style.backgroundColor]="legend.active ? legend.color : '#ccc'" matListIcon *ngIf="!legend.amenity_image">
+            <fa-icon [icon]="legend.icon"></fa-icon>
+          </div>
+          <p matLine> {{ legend.title }} </p>
+          <mat-divider *ngIf="legend.title !== 'S-ryhmä'"></mat-divider>
+        </mat-list-item>
+      </mat-list>
+    </div>
+    <div class="footer">
+      <p>Mitä kartalta puuttuu? Onko jokin tieto väärin? Laita viestiä <a href="mailto:kartta@proximi.io">kartta@proximi.io</a>, niin korjataan kuntoon!</p>
 
-    <p>Kartta päivitetty {{ currentDate | date: 'dd.MM.yyyy' }}</p>
-  </div>
+      <p>Kartta päivitetty {{ currentDate | date: 'dd.MM.yyyy' }}</p>
+    </div>
+  </mat-expansion-panel>
   <!--<mat-form-field appearance="outline">
     <mat-label>{{ endPointLabel }}</mat-label>
     <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn">

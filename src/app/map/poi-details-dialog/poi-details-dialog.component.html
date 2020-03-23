@@ -5,18 +5,40 @@
   </mat-card-header>
   <mat-card-content>
     <mat-list>
-      <mat-list-item *ngFor="let item of metadata?.openHours | keyvalue">
+      <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
-        <ng-container [ngSwitch]="item.key">
-          <strong *ngSwitchCase="0">Ma:</strong>
-          <strong *ngSwitchCase="1">Ti:</strong>
-          <strong *ngSwitchCase="2">Ke:</strong>
-          <strong *ngSwitchCase="3">To:</strong>
-          <strong *ngSwitchCase="4">Pe:</strong>
-          <strong *ngSwitchCase="5">La:</strong>
-          <strong *ngSwitchCase="6">Su:</strong>
-        </ng-container>
-        <span>{{ item.value.fi }}</span>
+        <strong>Ma:</strong>
+        <span>{{ metadata?.openHours[1].fi }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <strong>Ti:</strong>
+        <span>{{ metadata?.openHours[2].fi }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <strong>Ke:</strong>
+        <span>{{ metadata?.openHours[3].fi }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <strong>To:</strong>
+        <span>{{ metadata?.openHours[4].fi }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <strong>Pe:</strong>
+        <span>{{ metadata?.openHours[5].fi }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <strong>La:</strong>
+        <span>{{ metadata?.openHours[6].fi }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <fa-icon [icon]="['fad', 'clock']"></fa-icon>
+        <strong>Su:</strong>
+        <span>{{ metadata?.openHours[0].fi }}</span>
       </mat-list-item>
     </mat-list>
   </mat-card-content>

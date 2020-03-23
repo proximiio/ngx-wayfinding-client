@@ -54,6 +54,7 @@ export class SidebarComponent implements OnInit {
     active: true
   }];
   currentDate = new Date();
+  panelOpenState = true;
 
   constructor(
     private authService: AuthService,
@@ -156,6 +157,10 @@ export class SidebarComponent implements OnInit {
   onLegendToggle(legend) {
     legend.active = !legend.active;
     this.sidebarService.legendToggleListener.next(legend);
+  }
+
+  togglePanel() {
+    this.panelOpenState = !this.panelOpenState;
   }
 
 }

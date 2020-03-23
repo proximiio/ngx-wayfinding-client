@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class SidebarService {
+  public window = 'lg';
   public sidebarStatus = new Subject<boolean>();
   public startPointListener = new Subject<any>();
   public endPointListener = new Subject<any>();

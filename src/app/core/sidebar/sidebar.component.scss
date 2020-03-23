@@ -20,6 +20,16 @@
     padding: 1rem 2rem;
   }
 
+  .mat-expansion-panel {
+    border-radius: 0;
+    color: rgba(0,0,0,.87);
+    background: transparent;
+    ::ng-deep .mat-expansion-panel-body {
+      background: transparent;
+      padding: 0;
+    }
+  }
+
   .legend {
     .mat-list {
       .mat-list-item {
