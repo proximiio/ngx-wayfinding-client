@@ -203,7 +203,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   updateImages() {
     const amenityIds = new Set(
-      this.features.features.filter(f => f.properties && f.properties.usecase === 'poi' && f.properties.amenity)
+      this.features.features.filter(f => f.properties && f.properties.usecase === 'poi' && f.properties.amenity && f.icon)
         .map(f => f.properties.amenity)
     );
 
