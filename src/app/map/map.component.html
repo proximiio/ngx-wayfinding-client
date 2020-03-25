@@ -40,7 +40,7 @@
       >
       </mgl-image>
     </ng-container>
-    <ng-container *ngIf="showAds && showAdsByZoom">
+    <ng-container *ngIf="showAds && showAdsByZoom && level === 0">
       <mgl-marker
         *ngFor="let ad of ads"
         [lngLat]="ad.coordinates">

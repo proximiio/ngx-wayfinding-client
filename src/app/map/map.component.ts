@@ -564,7 +564,7 @@ export class MapComponent implements OnInit, OnDestroy {
   onZoomEnd(e) {
     const zoom = parseInt(e.target.style.z, 0);
     if (zoom > 16) {
-      this.showAdsByZoom = true
+      this.showAdsByZoom = true;
     } else {
       this.showAdsByZoom = false;
     }
