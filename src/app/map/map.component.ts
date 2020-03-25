@@ -90,6 +90,7 @@ export class MapComponent implements OnInit, OnDestroy {
   accessibleOnly = false;
   showAds = true;
   ads = [];
+  showAdsByZoom = true;
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -558,6 +559,15 @@ export class MapComponent implements OnInit, OnDestroy {
       data: ad,
       panelClass: 'dialog-transparent'
     });
+  }
+
+  onZoomEnd(e) {
+    const zoom = parseInt(e.target.style.z, 0);
+    if (zoom > 16) {
+      this.showAdsByZoom = true
+    } else {
+      this.showAdsByZoom = false;
+    }
   }
 
   private centerizeMap(location, zoom) {

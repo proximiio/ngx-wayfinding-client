@@ -31,6 +31,7 @@
     [bearing]="mapBearing"
     [movingMethod]="mapMovingMethod"
     (load)="onLoad($event)"
+    (zoomEnd)="onZoomEnd($event)"
   >
     <ng-container *ngFor="let key of objectKeys(images)">
       <mgl-image
@@ -39,7 +40,7 @@
       >
       </mgl-image>
     </ng-container>
-    <ng-container *ngIf="showAds">
+    <ng-container *ngIf="showAds && showAdsByZoom">
       <mgl-marker
         *ngFor="let ad of ads"
         [lngLat]="ad.coordinates">
@@ -74,7 +75,15 @@
         "
       [layout]="{
           'icon-image': '{amenity}',
-          'icon-size': iconSize,
+          'icon-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            17,
+            0.2,
+            22,
+            0.5
+          ],
           'symbol-placement': 'point',
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
@@ -87,7 +96,7 @@
       type="symbol"
       [id]="Constants.LAYER_POIS_LABELS"
       [source]="Constants.SOURCE_POI"
-      [minzoom]="18"
+      [minzoom]="19"
       [maxzoom]="24"
       [filter]="
           [
@@ -99,7 +108,15 @@
       [layout]="{
           'text-offset': [0, 2],
           'text-field': ['get', 'title'],
-          'text-size': 14,
+          'text-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            19,
+            10,
+            22,
+            14
+          ],
           'text-font': [font],
           'symbol-placement': 'point',
           'text-allow-overlap': false,
@@ -208,7 +225,15 @@
           ]
         "
       [paint]="{
-        'circle-radius': 38,
+        'circle-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          17,
+          15,
+          22,
+          38
+        ],
         'circle-blur': 0.5,
         'circle-color': '#3887be'
       }"
@@ -229,7 +254,15 @@
           ]
         "
       [paint]="{
-        'circle-radius': 38,
+        'circle-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          17,
+          15,
+          22,
+          38
+        ],
         'circle-blur': 0.5,
         'circle-color': '#40dc7e'
       }"
@@ -250,7 +283,15 @@
           ]
         "
       [paint]="{
-        'circle-radius': 38,
+        'circle-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          17,
+          15,
+          22,
+          38
+        ],
         'circle-blur': 0.5,
         'circle-color': '#8a7fff'
       }"
