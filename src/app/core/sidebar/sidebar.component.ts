@@ -20,8 +20,8 @@ export class SidebarComponent implements OnInit {
   pois;
   selectedPlace;
   showPlaceSelector = false;
-  endPointLabel = 'Hae kaupan valikoimasta';
-  startPointLabel = 'Valitse lähtöpiste';
+  endPointLabel = 'Search from store selection';
+  startPointLabel = 'Choose starting point';
   placeSelectorLabel = 'Pick up a place';
   useCustomPois = false;
   customPois = [];

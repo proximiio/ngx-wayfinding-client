@@ -24,7 +24,7 @@
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'search']" transform="up-3"></fa-icon></span>
   </mat-form-field>
-  <mat-form-field appearance="outline">
+  <!--<mat-form-field appearance="outline">
     <mat-label>{{ startPointLabel }}</mat-label>
     <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
@@ -37,7 +37,7 @@
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>
-  </mat-form-field>
+  </mat-form-field>-->
   <div *ngIf="showOnlyAccessibleToggle">
     <button type="button" class="accessible-btn" (click)="onAccessibleOnlyToggle()">
       <fa-icon [icon]="['fal', 'wheelchair']" size="lg"></fa-icon>
