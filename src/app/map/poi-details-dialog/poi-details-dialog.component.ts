@@ -8,16 +8,18 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class PoiDetailsDialogComponent implements OnInit {
   metadata;
+  images;
 
   constructor(
     public dialogRef: MatDialogRef<PoiDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public poi: any
   ) {
-    console.log(this.poi);
+    console.log('poi', this.poi);
   }
 
   ngOnInit() {
     this.metadata = JSON.parse(this.poi.properties.metadata);
+    this.images = JSON.parse(this.poi.properties.images);
   }
 
   onCloseClick(): void {

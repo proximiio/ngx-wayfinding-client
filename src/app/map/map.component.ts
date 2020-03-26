@@ -8,6 +8,7 @@ import * as Constants from './constants';
 import { MapboxGeoJSONFeature, MapLayerMouseEvent } from 'mapbox-gl';
 import { PoiDetailsDialogComponent } from './poi-details-dialog/poi-details-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import * as moment from 'moment';
 
 const GEO_API_ROOT = 'https://api.proximi.fi/v5/geo';
 
@@ -109,6 +110,9 @@ export class MapComponent implements OnInit, OnDestroy {
       }),
       this.sidebarService.getLegendToggleListener().subscribe(legend => {
         this.togglePoiVisibility(legend);
+      }),
+      this.sidebarService.getOnlyOpenedListener().subscribe(val => {
+        this.onlyOpenedPois(val);
       })
     );
   }
@@ -161,6 +165,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   onLoad(map) {
     this.map = map;
+    this.addLayerFilters();
     this.refreshLayers();
     this.mapLoaded.emit(true);
     this.map.resize();
@@ -190,8 +195,24 @@ export class MapComponent implements OnInit, OnDestroy {
 
   refreshLayers() {
     if (this.map) {
+      const clusterFeatures = {...this.filteredFeatures};
+      clusterFeatures['features'] = clusterFeatures['features'].filter(f => f.properties.visibility === 'visible');
       this.map.getSource('main').setData(this.filteredFeatures);
-      this.map.getSource('clusters').setData(this.filteredFeatures);
+      this.map.getSource('clusters').setData(clusterFeatures);
+    }
+  }
+
+  addLayerFilters() {
+    const poiLayers = ['pois-icons', 'pois-labels'];
+    if (this.map) {
+      poiLayers.forEach(l => {
+        const layer = this.map.getLayer(l);
+        if (layer && layer.filter && Array.isArray(layer.filter)) {
+          const filterArray = [...layer.filter];
+          filterArray.push(['!=', ['get', 'visibility'], 'none']);
+          this.map.setFilter(l, filterArray);
+        }
+      });
     }
   }
 
@@ -223,10 +244,47 @@ export class MapComponent implements OnInit, OnDestroy {
     }*/
   }
 
+  onlyOpenedPois(showOnlyOpened) {
+    if (showOnlyOpened) {
+      this.filteredFeatures['features'] = this.filteredFeatures['features'].map(f => {
+        const metadata = f.properties.metadata;
+        f.properties.visibility =
+          metadata && metadata.openHours && metadata.openHours.mon && this.isOpen(metadata.openHours) ?
+            'visible' :
+            'none';
+        return f;
+      });
+    } else {
+      this.filteredFeatures['features'] = this.filteredFeatures['features'].map(f => {
+        f.properties.visibility = 'visible';
+        return f;
+      });
+    }
+    this.refreshLayers();
+  }
+
   private centerizeMap(location, zoom) {
     this.mapCenter = [location.lng, location.lat];
     if (this.mapZoom[0] === 0 && zoom) {
       this.mapZoom = [zoom];
+    }
+  }
+
+  private isOpen(openHours) {
+    const currentDay = moment().format('ddd').toLowerCase();
+    const currentOpenHours = openHours[currentDay];
+    if (currentOpenHours.open === 'Suljettu') {
+      return false;
+    } else {
+      const open = moment()
+        .hour(currentOpenHours.open.split('.')[0])
+        .minute(currentOpenHours.open.split('.')[1])
+        .second(0);
+      const close = moment()
+        .hour(currentOpenHours.close.split('.')[0])
+        .minute(currentOpenHours.close.split('.')[1])
+        .second(0);
+      return moment().isBetween(open, close);
     }
   }
 

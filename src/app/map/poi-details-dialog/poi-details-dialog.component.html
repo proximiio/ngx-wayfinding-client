@@ -1,48 +1,59 @@
 <mat-card>
   <mat-card-header>
+    <button mat-mini-fab color="primary" (click)="onCloseClick()"><fa-icon [icon]="['fal', 'times']"></fa-icon></button>
     <mat-card-title>{{ poi.properties.title }}</mat-card-title>
-    <mat-card-subtitle>{{ metadata?.description?.fi }}</mat-card-subtitle>
+    <mat-card-subtitle>{{ metadata?.address?.fi }}</mat-card-subtitle>
+    <mat-card-subtitle><a [href]="metadata['website-url']" target="_blank">{{ metadata['website-url'] }}</a></mat-card-subtitle>
   </mat-card-header>
+  <img
+    mat-card-image
+    [src]="images[0]"
+    [alt]="poi.properties.title"
+    *ngIf="images && images.length > 0">
   <mat-card-content>
-    <mat-list>
+    <mat-list *ngIf="metadata['metadata.group'] === 'ravintola_takeaway'">
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>Ma:</strong>
-        <span>{{ metadata?.openHours[1].fi }}</span>
+        <span>Open {{ metadata?.openHours?.mon?.open }} - Close {{ metadata?.openHours?.mon?.close }}</span>
       </mat-list-item>
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>Ti:</strong>
-        <span>{{ metadata?.openHours[2].fi }}</span>
+        <span>Open {{ metadata?.openHours?.tue?.open }} - Close {{ metadata?.openHours?.tue?.close }}</span>
       </mat-list-item>
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>Ke:</strong>
-        <span>{{ metadata?.openHours[3].fi }}</span>
+        <span>Open {{ metadata?.openHours?.wed?.open }} - Close {{ metadata?.openHours?.wed?.close }}</span>
       </mat-list-item>
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>To:</strong>
-        <span>{{ metadata?.openHours[4].fi }}</span>
+        <span>Open {{ metadata?.openHours?.thu?.open }} - Close {{ metadata?.openHours?.thu?.close }}</span>
       </mat-list-item>
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>Pe:</strong>
-        <span>{{ metadata?.openHours[5].fi }}</span>
+        <span>Open {{ metadata?.openHours?.fri?.open }} - Close {{ metadata?.openHours?.fri?.close }}</span>
       </mat-list-item>
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>La:</strong>
-        <span>{{ metadata?.openHours[6].fi }}</span>
+        <span>Open {{ metadata?.openHours?.sat?.open }} - Close {{ metadata?.openHours?.sat?.close }}</span>
       </mat-list-item>
       <mat-list-item>
         <fa-icon [icon]="['fad', 'clock']"></fa-icon>
         <strong>Su:</strong>
-        <span>{{ metadata?.openHours[0].fi }}</span>
+        <span>Open {{ metadata?.openHours?.sun?.open }} - Close {{ metadata?.openHours?.sun?.close }}</span>
       </mat-list-item>
     </mat-list>
+    <p *ngIf="metadata['metadata.group'] !== 'ravintola_takeaway'">
+      {{ metadata?.description.fi }}
+    </p>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-raised-button color="warn" (click)="onCloseClick()">Sulje</button>
+    <a mat-raised-button color="warn" [href]="metadata['info-url']" target="_blank" *ngIf="metadata['info-url']">Info</a>
+    <a mat-raised-button color="warn" [href]="'tel:' + metadata?.phone" *ngIf="metadata?.phone">{{ metadata?.phone }}</a>
   </mat-card-actions>
 </mat-card>

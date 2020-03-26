@@ -11,6 +11,13 @@
       <ng-select ngSelectMat [items]="places" bindLabel="name" (change)="onPlaceSelect($event)" [(ngModel)]="selectedPlace" ></ng-select>
       <span matPrefix><fa-icon [icon]="['fal', 'map-marker-alt']" transform="up-3"></fa-icon></span>
     </mat-form-field>
+    <mat-slide-toggle
+      color="warn"
+      labelPosition="before"
+      [(ngModel)]="showOnlyOpened"
+      (change)="onShowOnlyOpened()">
+      Näytä vain avoinna olevat kohteet:
+    </mat-slide-toggle>
   </div>
   <mat-expansion-panel [expanded]="panelOpenState || sidebarService.window === 'lg'">
     <div class="legend">
@@ -21,7 +28,10 @@
             <fa-icon [icon]="legend.icon"></fa-icon>
           </div>
           <p matLine> {{ legend.title }} </p>
-          <mat-divider *ngIf="legend.title !== 'S-ryhmä'"></mat-divider>
+          <mat-slide-toggle
+            [checked]="legend.active">
+          </mat-slide-toggle>
+          <mat-divider *ngIf="legend.title !== 'Ruokakaupat'"></mat-divider>
         </mat-list-item>
       </mat-list>
     </div>

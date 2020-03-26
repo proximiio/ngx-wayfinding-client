@@ -11,11 +11,19 @@ mat-card {
       font-size: 16px;
       margin-bottom: 1.5rem;
     }
+
+    button {
+      margin-top: -1rem;
+      position: absolute;
+      right: 16px;
+    }
   }
   mat-card-content {
     background-color: white;
     margin: 16px -16px;
     padding: 1rem .5rem;
+    color: #333;
+
     mat-list {
       mat-list-item {
         color: #333;

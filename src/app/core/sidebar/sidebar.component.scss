@@ -18,6 +18,11 @@
   .place-selector {
     background-color: #3A4BB5;
     padding: 1rem 2rem;
+
+    mat-slide-toggle {
+      font-size: 14px;
+      color: white;
+    }
   }
 
   .mat-expansion-panel {
@@ -236,6 +241,9 @@
     }
     .place-selector {
       padding: 1rem 1rem 0;
+      mat-slide-toggle {
+        margin-bottom: 1rem;
+      }
     }
     .legend {
       .mat-list {
