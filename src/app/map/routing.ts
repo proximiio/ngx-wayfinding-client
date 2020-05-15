@@ -1,0 +1,47 @@
+import Wayfinding from './wayfinding';
+import Feature, { FeatureCollection } from './models/feature.model';
+import { lineString } from '@turf/helpers';
+
+export default class Routing {
+  data: FeatureCollection;
+  wayfinding: any;
+
+  constructor() {
+    this.data = new FeatureCollection({});
+  }
+
+  setData(collection: FeatureCollection) {
+    this.data = collection;
+    this.wayfinding = new Wayfinding(this.data);
+    this.wayfinding.preprocess();
+    // pathfinding.load(neighbourList, wallOffsets);
+    // this.pathFinder.setConfiguration({
+        // avoidEscalators: true,
+        // avoidNarrowPaths: true,
+        // avoidRevolvingDoors: true
+    // });
+  }
+
+  route(start: Feature, finish: Feature) {
+    console.log('routing with start', start, 'finish', finish);
+    const points = this.wayfinding.runAStar(start, finish);
+    if (!points) {
+      return null;
+    }
+
+    const levelPoints = {} as any;
+    points.forEach((point: any) => {
+      if (typeof levelPoints[point.properties.level] === 'undefined') {
+        levelPoints[point.properties.level] = [];
+      }
+      levelPoints[point.properties.level].push(point);
+    });
+
+    const levels = Object.keys(levelPoints);
+    const levelPaths = {} as any;
+    levels.forEach(level => {
+      levelPaths[level] = new Feature(lineString(levelPoints[level].map((point: any) => point.geometry.coordinates)));
+    });
+    return levelPaths;
+  }
+}

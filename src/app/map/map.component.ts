@@ -2,12 +2,39 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core
 import { MapService } from './map.service';
 import { SidebarService } from '../core/sidebar/sidebar.service';
 import { ResizedEvent } from 'angular-resize-event';
-import along from '@turf/along';
 import { AuthService } from '../auth/auth.service';
-import * as Constants from './constants';
-import { MapLayerMouseEvent } from 'mapbox-gl';
+import Amenity from './models/amenity.model';
+import Floor from './models/floor.model';
+import Place from './models/place.model';
+import Style from './models/style.model';
+import Feature, { FeatureCollection } from './models/feature.model';
+import RoutingSource from './sources/routing_source';
+import GeoJSONSource from './sources/geojson_source';
+import SyntheticSource from './sources/synthetic_source';
+import ClusterSource from './sources/cluster_source';
+import ImageSourceManager from './sources/image_source_manager';
+import Repository from './repository';
+import DataSource from './sources/data_source';
 
-const GEO_API_ROOT = 'https://api.proximi.fi/v4/geo';
+declare var mapa: any;
+
+interface State {
+  readonly initializing: boolean;
+  readonly amenities: Amenity[];
+  readonly floor: Floor;
+  readonly floors: Floor[];
+  readonly place: Place;
+  readonly places: Place[];
+  readonly style: Style;
+  readonly styles: Style[];
+  readonly selected: Feature[];
+  readonly selectorFeatures: Feature[];
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly loadingRoute: boolean;
+  readonly options: any;
+  readonly noPlaces: boolean;
+}
 
 @Component({
   selector: 'app-map',
@@ -16,76 +43,27 @@ const GEO_API_ROOT = 'https://api.proximi.fi/v4/geo';
 })
 export class MapComponent implements OnInit, OnDestroy {
   map: any;
-  mapStyle = '';
-  mapCenter = [0, 0];
-  mapZoom = [12];
-  mapBearing = 20;
-  mapPitch = 40;
-  floorplans: any[] = [];
   mapLoaded = new EventEmitter<boolean>();
-  isLoaded = false;
   currentUser;
-  config;
   currentUserData;
-  selectedFloor;
-  selectedPlace;
   amenities = [];
-  amenityMap = {};
-  amenityLinks = {};
   amenityBaseLinks: any = {};
   features: any = {};
-  filteredFeatures = [];
-  featureCache = {};
-  level: number;
-  route = null;
-  routeCollection = {
-    type: 'FeatureCollection',
-    features: []
-  };
-  floors = [];
-  places = [];
-  showGeoJSON = true;
   showRaster = true;
-  showPOI = true;
-  bottomLayer = Constants.default.DEFAULT_BOTTOM_LAYER;
-  lastFloorLayer = this.bottomLayer;
-  routingStartImage = { uri: 'assets/start-point-icon.png' };
-  routingContinueImage = { uri: 'assets/continue-point-icon.png' };
-  routingFinishImage = { uri: 'assets/end-point-icon.png' };
-  useCustomRoutingImages = false;
-  iconSize = 0.5;
   imagesIteration = 0;
   images = {};
-  font = 'Klokantech Noto Sans Regular';
-  routeLineStyle = {
-    'line-opacity': 1,
-    'line-color': '#00ee00',
-    'line-width': 12
-  };
-  useDottedRouteLine = true;
-  singleLevel = false;
-  showLevelChangers = true;
-  Constants = Constants.default;
   objectKeys = Object.keys;
-  poiTextStyle = {
-    textOffset: [0, 2],
-    textField: ['get', 'title'],
-    textSize: 14,
-    textFont: this.font,
-    symbolPlacement: 'point',
-    textAllowOverlap: false
-  };
   startPoi;
   endPoi;
-  ignoreRoute = false;
-  currentLevelChanger = null;
-  highlightClickedPoi = true;
-  highlightSelectedPoi = true;
-  highlightPointsCollection = {
-    type: 'FeatureCollection',
-    features: []
-  };
   accessibleOnly = false;
+  state: State;
+  originalStyle: any;
+  geojsonSource: GeoJSONSource = new GeoJSONSource(new FeatureCollection({}));
+  syntheticSource: SyntheticSource = new SyntheticSource(new FeatureCollection({}));
+  routingSource: RoutingSource = new RoutingSource();
+  clusterSource: ClusterSource = new ClusterSource();
+  imageSourceManager: ImageSourceManager = new ImageSourceManager(this.authService);
+
   @Input() mapMovingMethod: string;
   private subs = [];
 
@@ -95,89 +73,368 @@ export class MapComponent implements OnInit, OnDestroy {
     public sidebarService: SidebarService
   ) {
     this.currentUser = this.authService.getCurrentUser();
-    this.config = this.authService.getCurrentUserConfig();
     this.currentUserData = this.authService.getCurrentUserData();
-    this.places = this.currentUserData.places;
-    this.floors = this.currentUserData.floors;
     this.features = this.currentUserData.features;
-    this.filteredFeatures = [...this.features.features];
     this.amenities = this.currentUserData.amenities;
-    this.level = this.config.default_floor_number ? this.config.default_floor_number : 0;
-    this.accessibleOnly = this.config.accessible_only ? this.config.accessible_only : false;
-    this.setFloor(this.currentUserData.defaultFloor);
-    this.selectedPlace = this.currentUserData.defaultPlace;
-    this.showRaster = this.config.show_floorplans ? this.config.show_floorplans : true;
 
-    this.amenityMap = this.amenities.reduce((acc, item) => {
-      if (item.icon && item.icon.match(/data:image/)) {
-        acc[item.id] = item.icon;
-        this.amenityBaseLinks[item.id] = { uri: item.icon };
-        this.amenityLinks[item.id] = { uri: `${GEO_API_ROOT}/amenities/${item.id}.png?token=${this.currentUser.token}` };
+    this.state = {
+      amenities: [],
+      initializing: true,
+      floor: new Floor({}),
+      floors: [],
+      place: new Place({}),
+      places: [],
+      style: new Style({}),
+      styles: [],
+      selected: [],
+      selectorFeatures: [],
+      latitude: 60.1669635,
+      longitude: 24.9217484,
+      loadingRoute: false,
+      noPlaces: false,
+      options: {
+        coordinates: [0, 0],
+        zoom: 0,
+        pitch: 0,
+        bearing: 0,
+        bounds: [[0, 0], [0, 0]]
       }
-      return acc;
-    }, {});
+    };
 
-
-    if (!this.useCustomRoutingImages) {
-      this.routingStartImage = this.amenityBaseLinks.route_start;
-      this.routingFinishImage = this.amenityBaseLinks.route_finish;
-    }
+    this.onPlaceSelect = this.onPlaceSelect.bind(this);
+    this.onFloorSelect = this.onFloorSelect.bind(this);
+    this.onMapReady = this.onMapReady.bind(this);
+    // this.onMapSelection = this.onMapSelection.bind(this);
+    // this.onBoxSelection = this.onBoxSelection.bind(this);
+    // this.onCenterChange = this.onCenterChange.bind(this);
+    this.onSourceChange = this.onSourceChange.bind(this);
+    this.onSyntheticChange = this.onSyntheticChange.bind(this);
+    this.onStyleChange = this.onStyleChange.bind(this);
+    this.onStyleSelect = this.onStyleSelect.bind(this);
+    this.onRouteUpdate = this.onRouteUpdate.bind(this);
+    this.onRouteChange = this.onRouteChange.bind(this);
+    this.onRouteCancel = this.onRouteCancel.bind(this);
+    this.onOptionsChange = this.onOptionsChange.bind(this);
 
     this.updateImages();
-
-    const center =
-      this.config.point_of_origin &&
-      this.config.point_of_origin.lat &&
-      this.config.point_of_origin.lng ?
-        [this.config.point_of_origin.lng, this.config.point_of_origin.lat] :
-        this.selectedPlace ? [this.selectedPlace.location.lng, this.selectedPlace.location.lat] : [0, 0];
-    this.mapCenter = center;
-    this.mapStyle = this.styleURL;
-    if (!this.mapMovingMethod) {
-      this.mapMovingMethod = 'flyTo';
-    }
   }
 
   ngOnInit() {
+    this.initialize();
     this.subs.push(
-      this.mapService.mapCenterListener.subscribe(res => {
-        if (res && res.location) {
-          this.centerizeMap(res.location, res.zoom);
-        }
-      }),
       this.sidebarService.getStartPointListener().subscribe(poi => {
         this.startPoi = poi;
-        const feature = poi ? this.filteredFeatures.filter(f => f.properties.id === poi.id)[0] : null;
         if (poi && !this.endPoi) {
           this.centerOnPoi(poi);
         }
-        this.generateHighlightSource(feature, 'startPoi');
-        this.generateRoute();
+        // this.generateRoute();
       }),
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
-        const feature = poi ? this.filteredFeatures.filter(f => f.properties.id === poi.id)[0] : null;
         if (poi && !this.startPoi) {
           this.centerOnPoi(poi);
         }
-        this.generateHighlightSource(feature, 'endPoi');
-        this.generateRoute();
+        // this.generateRoute();
       }),
-      this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
-        this.accessibleOnly = accessibleOnly;
-        this.generateRoute();
-      }),
+      // this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
+       // this.accessibleOnly = accessibleOnly;
+       // this.generateRoute();
+      // }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
         this.setPlace(place);
       })
     );
   }
 
+  async initialize() {
+    this.geojsonSource.observe(this.onSourceChange);
+    this.syntheticSource.observe(this.onSyntheticChange);
+    this.routingSource.observe(this.onRouteChange);
+    await this.fetch();
+  }
+
+  async cancelObservers() {
+    this.geojsonSource.cancel(this.onSourceChange);
+    this.syntheticSource.cancel(this.onSyntheticChange);
+    this.state.style.cancel(this.onStyleChange);
+  }
+
+  async fetch() {
+    const { places, style, styles } = await Repository.getPackage();
+    this.geojsonSource.fetch(this.features);
+    this.onSourceChange();
+    this.prepareStyle(style);
+    const place = places.length > 0 ? places[0] : new Place({});
+    this.imageSourceManager.belowLayer = style.usesPrefixes() ? 'proximiio-floors' : 'floors';
+    this.imageSourceManager.initialize();
+    this.state = {
+      ...this.state,
+      amenities: this.amenities,
+      initializing: false,
+      place,
+      places,
+      style,
+      styles,
+      latitude: place.lat,
+      longitude: place.lng,
+      noPlaces: places.length === 0
+    };
+    style.observe(this.onStyleChange);
+    await this.onPlaceSelect(this.state.place);
+    console.log(this.state);
+  }
+
+  prepareStyle(style: Style) {
+    style.setSource('main', this.geojsonSource);
+    style.setSource('synthetic', this.syntheticSource);
+    style.setSource('route', this.routingSource);
+    style.setSource('clusters', this.clusterSource);
+    style.setLevel(0);
+  }
+
+  onRouteChange(event?: string) {
+    if (event === 'loading-start') {
+      this.state = {...this.state, loadingRoute: true};
+      return;
+    }
+
+    if (event === 'loading-finished') {
+      this.state = {...this.state, loadingRoute: false};
+      return;
+    }
+
+    const style = this.state.style;
+    style.setSource('route', this.routingSource);
+    this.state = {...this.state, style};
+
+    this.updateMapSource(this.routingSource);
+  }
+
+  onSourceChange() {
+    this.state = {
+      ...this.state,
+      selected: this.state.selected.map(feature => this.geojsonSource.get(feature.id) || this.geojsonSource.getInternal(feature.properties.id)),
+      style: this.state.style
+    };
+    this.updateMapSource(this.geojsonSource);
+    // this.routingSource.routing.setData(this.geojsonSource.collection)
+    this.updateCluster();
+  }
+
+  onSyntheticChange() {
+    this.state.style.setSource('synthetic', this.syntheticSource);
+    this.updateMapSource(this.syntheticSource);
+  }
+
+  updateMapSource(source: DataSource) {
+    const map = this.map;
+    if (map) {
+      const mapSource = map.getSource(source.id) as any;
+      if (mapSource) {
+        mapSource.setData(source.data);
+      }
+    }
+  }
+
+  onStyleSelect(style: Style) {
+    const map = this.map;
+    if (map) {
+      this.prepareStyle(style);
+      map.setStyle(style.json);
+    }
+
+    this.state = {...this.state, style};
+  }
+
+  onStyleChange(event?: string, data?: any) {
+    console.log('onStyleChange', event, data);
+
+    const map = this.map;
+    if (map) {
+      if (event === 'polygon-editing-toggled') {
+        if (this.state.style.polygonEditing) {
+          if (!this.state.style.segments) {
+            this.state.style.toggleSegments();
+          }
+          if (!this.state.style.routable) {
+            this.state.style.toggleRoutable();
+          }
+        } else {
+          if (this.state.style.overlay) {
+            this.state.style.toggleOverlay();
+          }
+          if (this.state.style.segments) {
+            this.state.style.toggleSegments();
+          }
+          if (this.state.style.routable) {
+            this.state.style.toggleRoutable();
+          }
+        }
+      }
+
+      if (event === 'overlay-toggled') {
+        const overlay = this.state.style.overlay ? 'visible' : 'none';
+        map.setLayoutProperty('main-polygon-fill', 'visibility', overlay);
+        map.setLayoutProperty('main-polygon-outline', 'visibility', overlay);
+      }
+
+      if (event === 'segments-toggled') {
+        const segments = this.state.style.segments ? 'visible' : 'none';
+        map.setLayoutProperty('main-segment-fill', 'visibility', segments);
+        map.setLayoutProperty('main-segment-outline', 'visibility', segments);
+      }
+
+      if (event === 'routable-toggled') {
+        const routables = this.state.style.segments ? 'visible' : 'none';
+        map.setLayoutProperty('main-routable-fill', 'visibility', routables);
+        map.setLayoutProperty('main-routable-outline', 'visibility', routables);
+      }
+
+      if (event === 'cluster-toggled') {
+        const clusters = this.state.style.cluster ? 'visible' : 'none';
+        map.setLayoutProperty('clusters-circle', 'visibility', clusters);
+      }
+    }
+
+    if (event === 'layer-update' && data) {
+      const { layer, changes }: any = data;
+      const layoutChanges = (changes as any[]).filter(diff => diff.kind === 'E' && diff.path[0] === 'layout');
+      const paintChanges = (changes as any[]).filter(diff => diff.kind === 'E' && diff.path[0] === 'paint');
+      // tslint:disable-next-line:no-shadowed-variable
+      const map = this.map;
+      if (map) {
+        layoutChanges.forEach(change => {
+          if (change.kind === 'E') {
+            map.setLayoutProperty(layer.id, change.path[1], change.rhs);
+          }
+        });
+        paintChanges.forEach(change => {
+          if (change.kind === 'E') {
+            map.setPaintProperty(layer.id, change.path[1], change.rhs);
+          }
+        });
+      }
+    }
+    // this.map.setStyle(this.state.style);
+    console.log('new style set', this.state.style);
+    this.state = {...this.state, style: this.state.style};
+  }
+
+  onRasterToggle(value: boolean) {
+    this.imageSourceManager.enabled = value;
+    const map = this.map;
+    if (map) {
+      this.imageSourceManager.setLevel(map, this.state.floor.level);
+    }
+  }
+
+  onMapReady() {
+    // set paths visible if available
+    const map = this.map;
+    if (map) {
+      this.state.style.togglePaths(true);
+      // routing layers
+      const routingLayer = map.getLayer('routing-line-completed');
+      const usePrefixed = typeof routingLayer === 'undefined' && typeof map.getLayer('proximiio-routing-line-completed') !== 'undefined';
+      const shopsLayer = map.getLayer('shops');
+
+      if (usePrefixed) {
+        map.moveLayer('proximiio-routing-line-completed', 'proximiio-outer_wall');
+        map.moveLayer('proximiio-routing-line-remaining', 'proximiio-outer_wall');
+        map.moveLayer('proximiio-paths', 'routing-line-completed');
+      } else {
+        if (routingLayer) {
+          if (shopsLayer) {
+            map.moveLayer('routing-line-completed', 'proximiio-routing-symbols');
+            map.moveLayer('routing-line-remaining', 'proximiio-routing-symbols');
+          }
+          map.moveLayer('proximiio-paths', 'routing-line-completed');
+        }
+      }
+      map.setMaxZoom(30);
+      // const decodedChevron = await getImageFromBase64(chevron)
+      // map.addImage('chevron_right', decodedChevron as any)
+      this.updateMapSource(this.geojsonSource);
+      this.updateMapSource(this.routingSource);
+      this.updateCluster();
+      // map.setStyle(this.state.style);
+      this.imageSourceManager.setLevel(map, this.state.floor.level);
+    }
+  }
+
+  updateCluster() {
+    const map = this.map;
+    if (map) {
+      const data = {
+        type: 'FeatureCollection',
+        features: this.geojsonSource.data.features
+                    .filter(f => f.isPoint && f.hasLevel(this.state.floor.level))
+                    .map(f => f.json)
+      } as FeatureCollection;
+      const source = map.getSource('clusters') as any;
+      if (source) {
+        source.setData(data);
+      }
+    }
+  }
+
+  async onPlaceSelect(place: Place) {
+    this.state = {...this.state, place};
+    const floors = await Repository.getFloors(0, place.id);
+    const state: any = { floors: floors.sort((a, b) => a.level - b.level) };
+
+    if (floors.length > 0) {
+      const groundFloor = floors.find(floor => floor.level === 0);
+      if (groundFloor) {
+        state.floor = groundFloor;
+      } else {
+        state.floor = floors[0];
+      }
+    }
+
+    this.state = {...this.state, ...state};
+
+    const map = this.map;
+    if (map) {
+      map.flyTo({ center: [ place.lng, place.lat ] });
+    }
+  }
+
+  onFloorSelect(floor: Floor) {
+    const map = this.map;
+    if (map) {
+      this.state.style.setLevel(floor.level);
+      [...this.state.style.getLayers('main'), ...this.state.style.getLayers('route')].forEach(layer => map.setFilter(layer.id, layer.filter));
+      map.setStyle(this.state.style);
+      this.imageSourceManager.setLevel(map, floor.level);
+    }
+    this.state = {...this.state, floor, style: this.state.style};
+    this.updateCluster();
+  }
+
+  onRouteUpdate(start?: Feature, finish?: Feature) {
+    try {
+      this.routingSource.update(start, finish);
+    } catch (e) {
+      console.log('catched', e);
+    }
+    this.state = {...this.state, style: this.state.style};
+  }
+
+  onRouteCancel() {
+    this.routingSource.cancel();
+  }
+
+  onOptionsChange(options: any) {
+    this.state = {...this.state, options};
+  }
+
   centerOnPoi(poi) {
-    const floor = this.floors.filter(f => f.level === poi.level && f.place_id === this.selectedPlace.id)[0];
-    this.mapCenter = poi.coordinates;
-    this.mapZoom = [21];
-    this.setFloor(floor);
+    const floor = this.state.floors.find(f => f.level === poi.level);
+    // this.mapCenter = poi.coordinates;
+    // this.mapZoom = [21];
+    this.onFloorSelect(new Floor(floor));
+    // this.setFloor(floor);
   }
 
   onResized(event: ResizedEvent) {
@@ -186,10 +443,32 @@ export class MapComponent implements OnInit, OnDestroy {
     }
   }
 
-  get styleURL() {
-    return this.currentUser.organization.name === 'Tawar Mall' ?
-      `${GEO_API_ROOT}/style?token=${this.currentUser.token}&basic=true&skipfile=true` :
-      `${GEO_API_ROOT}/style?token=${this.currentUser.token}&basic=true`;
+  onFloorChange(way) {
+    let floor;
+    const nextLevel = way === 'up' ? this.state.floor.level + 1 : this.state.floor.level - 1;
+    floor = this.state.floors.filter(f => f.level === nextLevel) ? this.state.floors.filter(f => f.level === nextLevel)[0] : this.state.floor;
+    this.onFloorSelect(new Floor(floor));
+  }
+
+  setPlace(place) {
+    this.onPlaceSelect(new Place(place));
+  }
+
+  onLoad(map) {
+    mapa = map;
+    this.map = map;
+    this.onMapReady();
+    this.mapLoaded.emit(true);
+    this.map.resize();
+    this.subs.push(
+      this.sidebarService.getSidebarStatusListener().subscribe(() => {
+        if (this.map) {
+          setTimeout(() => {
+            this.map.resize();
+          }, 500);
+        }
+      })
+    );
   }
 
   updateImages() {
@@ -210,347 +489,13 @@ export class MapComponent implements OnInit, OnDestroy {
         images[amenity.id] = { uri: amenity.icon };
       });
 
-    images['bluedot'] = { uri: this.mapService.bluedot };
-    images[Constants.default.IMAGE_FLOORCHANGE_UP] = { uri: 'assets/go-up-alt.png' };
-    images[Constants.default.IMAGE_FLOORCHANGE_DOWN] = { uri: 'assets/go-down-alt.png' };
-    images[Constants.default.IMAGE_ROUTING_START] = this.routingStartImage;
-    images[Constants.default.IMAGE_ROUTING_CONTINUE] = this.useCustomRoutingImages ? this.routingContinueImage : this.routingFinishImage;
-    images[Constants.default.IMAGE_ROUTING_FINISH] = this.routingFinishImage;
-
     this.images = images;
     this.imagesIteration++;
   }
 
-  featuresForLevel(level, isPoi) {
-    const cacheKey = `${level}-${isPoi ? 'poi' : 'other'}`;
-    if (typeof this.featureCache[cacheKey] === 'undefined') {
-      this.featureCache[cacheKey] = {
-        type: 'FeatureCollection',
-        features: (isPoi ? this.filteredFeatures : this.features.features).filter(f => {
-          // f.properties.minzoom = 24;
-          if (!f.properties) {
-            return false;
-          }
-
-          if ((isPoi && f.properties.usecase !== 'poi') || (!isPoi && f.properties.usecase === 'poi')) {
-            return false;
-          }
-
-          if (f.properties.usecase && f.properties.usecase === 'levelchanger') {
-            return f.properties.level_min <= level && f.properties.level_max >= level;
-          } else {
-            return f.properties.level === level;
-          }
-        })
-      };
-    }
-    return this.featureCache[cacheKey];
-  }
-
-  onFloorChange(way, currentLevelChanger) {
-    let floor;
-    let nextLevel = way === 'up' ? this.level + 1 : this.level - 1;
-    if (currentLevelChanger && currentLevelChanger.way === way) {
-      nextLevel = currentLevelChanger.nextLevel;
-    }
-    floor =
-      this.floors.findIndex(f => f.level === nextLevel && f.place_id === this.selectedPlace.id) !== -1 ?
-        this.floors.filter(f => f.level === nextLevel && f.place_id === this.selectedPlace.id)[0] :
-        this.selectedFloor;
-    this.setFloor(floor);
-  }
-
-  setPlace(place) {
-    this.selectedPlace = place;
-    this.mapCenter = [this.selectedPlace.location.lng, this.selectedPlace.location.lat];
-    const floor = this.floors.filter(f => f.place_id === this.selectedPlace.id)[0];
-    if (floor) {
-      this.setFloor(floor);
-    }
-  }
-
-  setFloor(floor) {
-    if (floor) {
-      this.level = floor.level;
-      this.selectedFloor = floor;
-      this.generateFloorplanSource();
-      this.generateRoutingSource();
-      this.updateImages();
-      this.refreshLayers();
-    }
-  }
-
-  generateFloorplanSource() {
-    if (this.floorplans.findIndex(f => f.source.id === `${Constants.default.SOURCE_RASTER_FLOORPLAN}-${this.selectedFloor.id}`) === -1 ) {
-      this.floorplans = [];
-      if (
-        this.selectedFloor.level === this.level &&
-        (Array.isArray(this.selectedFloor.anchors) && this.selectedFloor.anchors.length === 4) &&
-        this.selectedFloor.floorplan_image_url != null && this.selectedFloor.floorplan_image_url.length > 0
-      ) {
-        const source = {
-          id: `${Constants.default.SOURCE_RASTER_FLOORPLAN}-${this.selectedFloor.id}`,
-          url: `https://api.proximi.fi/imageproxy?source=${this.selectedFloor.floorplan_image_url}`,
-          coordinates: this.selectedFloor.editor ?
-            this.selectedFloor.editor.coordinates :
-            [
-              [this.selectedFloor.anchors[0].lng, this.selectedFloor.anchors[0].lat],
-              [this.selectedFloor.anchors[1].lng, this.selectedFloor.anchors[1].lat],
-              [this.selectedFloor.anchors[3].lng, this.selectedFloor.anchors[3].lat],
-              [this.selectedFloor.anchors[2].lng, this.selectedFloor.anchors[2].lat]
-            ]
-        };
-        const layer = {
-          title: this.selectedFloor.name,
-          id: `${Constants.default.LAYER_RASTER_FLOORPLAN}-${this.selectedFloor.id}`,
-          layout: {
-            'visibility': this.showRaster ? 'visible' : 'none'
-          },
-          paint: {
-            'raster-opacity': 1
-          }
-        };
-        this.lastFloorLayer = layer.id;
-        this.floorplans.push({source: source, layer: layer});
-      }
-    }
-  }
-
-  generateRoute() {
-    if (this.startPoi && this.endPoi) {
-      this.mapService.getRoute(this.startPoi, this.endPoi, this.accessibleOnly, false, this.currentUser.token)
-        .subscribe(route => {
-          const startFloor = this.floors.filter(f => f.level === this.startPoi.level)[0];
-          this.route = route;
-          this.setFloor(startFloor); // this will also generate routing source
-        }, error => {
-          console.log(error);
-        });
-    } else if (!this.startPoi || !this.endPoi) {
-      this.cancelRoute();
-    }
-  }
-
-  generateRoutingSource() {
-    this.ignoreRoute = false;
-    this.currentLevelChanger = null;
-    let path = null;
-
-    if (!this.route) {
-      this.ignoreRoute = true;
-    } else if (this.route.levelPaths) {
-      const levelChanges = this.route.steps.filter(step => step.levelChange)
-        .map(step => {
-          const s = {
-            currentLevel: step.point[2],
-            nextLevel: step.nextPoint[2],
-            way: step.point[2] > step.nextPoint[2] ? 'down' : 'up'
-          };
-          return s;
-        });
-      this.currentLevelChanger = levelChanges.filter(change => change.currentLevel === this.level)[0];
-      path = this.singleLevel ? this.route.linestring.path : this.route.levelPaths[this.level];
-    }
-
-    if (!path) {
-      this.ignoreRoute = true;
-    }
-
-    if (!this.ignoreRoute) {
-      path.properties.usecase = 'route-line';
-
-      this.routeCollection = {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            id: Constants.default.FEATURE_ROUTING_START,
-            geometry: {
-              type: 'Point',
-              coordinates: path.geometry.coordinates[0]
-            },
-            properties: {
-              usecase: 'route-symbol',
-              icon: Constants.default.IMAGE_ROUTING_START
-            }
-          },
-          {
-            type: 'Feature',
-            id: Constants.default.FEATURE_ROUTING_FINISH,
-            geometry: {
-              type: 'Point',
-              coordinates: path.geometry.coordinates[path.geometry.coordinates.length - 1]
-            },
-            properties: {
-              usecase: 'route-symbol',
-              icon: this.currentLevelChanger ? Constants.default.IMAGE_ROUTING_CONTINUE : Constants.default.IMAGE_ROUTING_FINISH
-            }
-          }
-        ]
-      };
-
-      if (this.currentLevelChanger) {
-        this.routeCollection.features.push({
-          type: 'Feature',
-          id: this.currentLevelChanger.way === 'up' ? Constants.default.FEATURE_FLOORCHANGE_UP : Constants.default.FEATURE_FLOORCHANGE_DOWN,
-          geometry: {
-            type: 'Point',
-            coordinates: path.geometry.coordinates[path.geometry.coordinates.length - 1]
-          },
-          properties: {
-            usecase: 'floor-change-symbol',
-            icon: this.currentLevelChanger.way === 'up' ? Constants.default.IMAGE_FLOORCHANGE_UP : Constants.default.IMAGE_FLOORCHANGE_DOWN
-          }
-        });
-      }
-
-      if (!this.useDottedRouteLine) {
-        this.routeCollection.features.push(path);
-      }
-
-      if (this.useDottedRouteLine) {
-        const distance = this.route.distance;
-        let distanceRemaining = distance;
-        const separator = 1; // 1 meter
-        const chunks = [];
-        let i = 0;
-        while (distanceRemaining > separator) {
-          const point = along(path, (separator + i) / 1000);
-          point.properties.usecase = 'route-line-symbol';
-          chunks.push(point);
-          distanceRemaining -= separator;
-          i += separator;
-        }
-        this.routeCollection.features = [...this.routeCollection.features, ...chunks];
-      }
-
-      this.mapCenter = path.geometry.coordinates[0];
-      this.mapZoom = [19];
-
-      if (this.sidebarService.sidenavMode === 'over') {
-        this.sidebarService.closeSidebar();
-      }
-    }
-  }
-
-  cancelRoute() {
-    this.route = null;
-    this.generateRoutingSource();
-  }
-
-  onPoiClick(evt: MapLayerMouseEvent) {
-    const feature = this.filteredFeatures.filter(f => f.properties.id === evt.features[0].properties.id)[0];
-    if (feature) {
-      this.generateHighlightSource(feature, 'click');
-    }
-  }
-
-  generateHighlightSource(feature, type) {
-    if (feature) {
-      const newHighlight: any = {
-        type: 'Feature',
-        id: `Constants.default.FEATURE_HIGHLIGHT_POINT-${feature.id}`,
-        geometry: {
-          type: 'Point',
-          coordinates: feature.geometry.coordinates
-        },
-        properties: {
-          level: feature.properties.level
-        }
-      };
-      let previousClickHighlight = null;
-
-      if (type === 'click') {
-        newHighlight.properties.usecase = 'clicked-point-highlight';
-        previousClickHighlight = this.highlightPointsCollection.features.filter(f => f.id === newHighlight.id && f.properties.usecase === 'clicked-point-highlight')[0];
-      } else if (type === 'startPoi') {
-        newHighlight.properties.usecase = 'startpoi-point-highlight';
-      } else if (type === 'endPoi') {
-        newHighlight.properties.usecase = 'endpoi-point-highlight';
-      }
-
-      if (this.highlightPointsCollection.features.length > 0) {
-        // remove previous highlight instance with same usecase if exists
-        this.highlightPointsCollection.features = this.highlightPointsCollection.features.filter(f => f.properties.usecase !== newHighlight.properties.usecase);
-      }
-
-      // only add new feature if the previous one was not the clicked usecase and it's not the same otherwise keep it removed
-      if (!previousClickHighlight) {
-        this.highlightPointsCollection.features.push(newHighlight);
-      }
-    } else {
-      // remove highlight after poi unselect
-      if (type === 'startPoi') {
-        this.highlightPointsCollection.features = this.highlightPointsCollection.features.filter(f => f.properties.usecase !== 'startpoi-point-highlight');
-      } else if (type === 'endPoi') {
-        this.highlightPointsCollection.features = this.highlightPointsCollection.features.filter(f => f.properties.usecase !== 'endpoi-point-highlight');
-      }
-    }
-
-    this.highlightPointsCollection = {...this.highlightPointsCollection};
-  }
-
-  onLoad(map) {
-    this.map = map;
-    this.refreshLayers();
-    this.mapLoaded.emit(true);
-    this.map.resize();
-    this.isLoaded = true;
-    this.mapZoom = [17];
-    this.subs.push(
-      this.sidebarService.getSidebarStatusListener().subscribe(() => {
-        if (this.map) {
-          setTimeout(() => {
-            this.map.resize();
-          }, 500);
-        }
-      })
-    );
-  }
-
-  refreshLayers() {
-    if (this.map) {
-      this.map.getSource('main').setData(this.featuresForLevel(this.level, false));
-      const layers = this.map.getStyle().layers;
-      layers.forEach(l => {
-        const layer = this.map.getLayer(l.id);
-        if (layer && layer.filter) {
-          const filterArray = [...layer.filter];
-          let changed = false;
-          let expressions = false;
-          const levelProperties = ['level', 'level_min', 'level_max'];
-          filterArray.forEach(filter => {
-            if (Array.isArray(filter) && Array.isArray(filter[1]) && filter[1][0] === 'to-number' && levelProperties.includes(filter[1][1][1])) {
-              filter[2] = this.level;
-              changed = true;
-              expressions = true;
-            } else if (Array.isArray(filter) && levelProperties.includes(filter[1])) {
-              filter[2] = this.level;
-              changed = true;
-            }
-          });
-          if (expressions) {
-            filterArray.push(['!=', ['get', 'visibility'], 'none']);
-          } else {
-            filterArray.push(['!=', 'visibility', 'none']);
-          }
-          if (changed) {
-            this.map.setFilter(l.id, filterArray);
-          }
-        }
-      });
-    }
-  }
-
-  private centerizeMap(location, zoom) {
-    this.mapCenter = [location.lng, location.lat];
-    if (this.mapZoom[0] === 0 && zoom) {
-      this.mapZoom = [zoom];
-    }
-  }
-
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+    this.cancelObservers();
   }
 
 }
