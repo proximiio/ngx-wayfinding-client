@@ -21,3 +21,12 @@ export const kebabize = (data: any) => {
   });
   return result;
 };
+
+export const getImageFromBase64 = (encoded: string) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.src = encoded;
+    img.onload = () => resolve(img as HTMLImageElement);
+    img.onerror = (e: any) => resolve(img as HTMLImageElement);
+  });
+};

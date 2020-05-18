@@ -7,6 +7,7 @@ interface ChangeContainer {
   feature: Feature;
 }
 
+
 export default class RoutingSource extends DataSource {
   isEditable = false;
   start?: Feature;
@@ -22,6 +23,10 @@ export default class RoutingSource extends DataSource {
     this.routing = new Routing();
   }
 
+  toggleAccessible(value) {
+    this.routing.toggleOnlyAccessible(value);
+  }
+
   async update(start?: Feature, finish?: Feature) {
     this.start = start;
     this.finish = finish;
@@ -32,6 +37,7 @@ export default class RoutingSource extends DataSource {
     if (start && finish) {
       this.notify('loading-start');
       const levelPaths = this.routing.route(start, finish);
+      this.route = levelPaths;
       if (levelPaths) {
         const lines = [] as Feature[];
         const levels = Object.keys(levelPaths);

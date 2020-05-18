@@ -144,6 +144,12 @@ export default class Feature extends BaseModel {
   }
 
   get json() {
+    if (this.properties.cameFrom) {
+      delete this.properties.cameFrom;
+    }
+    if (this.properties.fixedPointMap) {
+      delete this.properties.fixedPointMap;
+    }
     const clone = JSON.parse(JSON.stringify(this));
     if (clone.properties.metadata && typeof clone.properties.metadata !== 'object') {
       try {

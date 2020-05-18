@@ -80,8 +80,6 @@ export default class Style extends Observable {
       return new BaseLayer(layer);
     }).concat(this.getUniversalLayers('main'))
       .concat(this.getSyntheticLayers());
-
-    console.log(this.layers);
   }
 
   getUniversalLayers(source: string) {

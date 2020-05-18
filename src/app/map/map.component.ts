@@ -1,9 +1,8 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { MapService } from './map.service';
 import { SidebarService } from '../core/sidebar/sidebar.service';
 import { ResizedEvent } from 'angular-resize-event';
 import { AuthService } from '../auth/auth.service';
-import Amenity from './models/amenity.model';
 import Floor from './models/floor.model';
 import Place from './models/place.model';
 import Style from './models/style.model';
@@ -15,20 +14,18 @@ import ClusterSource from './sources/cluster_source';
 import ImageSourceManager from './sources/image_source_manager';
 import Repository from './repository';
 import DataSource from './sources/data_source';
-
-declare var mapa: any;
+import { getImageFromBase64 } from './common';
+import { chevron } from './icons';
+import * as turf from '@turf/turf';
 
 interface State {
   readonly initializing: boolean;
-  readonly amenities: Amenity[];
   readonly floor: Floor;
   readonly floors: Floor[];
   readonly place: Place;
   readonly places: Place[];
   readonly style: Style;
   readonly styles: Style[];
-  readonly selected: Feature[];
-  readonly selectorFeatures: Feature[];
   readonly latitude: number;
   readonly longitude: number;
   readonly loadingRoute: boolean;
@@ -57,14 +54,12 @@ export class MapComponent implements OnInit, OnDestroy {
   endPoi;
   accessibleOnly = false;
   state: State;
-  originalStyle: any;
   geojsonSource: GeoJSONSource = new GeoJSONSource(new FeatureCollection({}));
   syntheticSource: SyntheticSource = new SyntheticSource(new FeatureCollection({}));
   routingSource: RoutingSource = new RoutingSource();
   clusterSource: ClusterSource = new ClusterSource();
-  imageSourceManager: ImageSourceManager = new ImageSourceManager(this.authService);
+  imageSourceManager: ImageSourceManager = new ImageSourceManager();
 
-  @Input() mapMovingMethod: string;
   private subs = [];
 
   constructor(
@@ -78,7 +73,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.amenities = this.currentUserData.amenities;
 
     this.state = {
-      amenities: [],
       initializing: true,
       floor: new Floor({}),
       floors: [],
@@ -86,8 +80,6 @@ export class MapComponent implements OnInit, OnDestroy {
       places: [],
       style: new Style({}),
       styles: [],
-      selected: [],
-      selectorFeatures: [],
       latitude: 60.1669635,
       longitude: 24.9217484,
       loadingRoute: false,
@@ -104,9 +96,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.onPlaceSelect = this.onPlaceSelect.bind(this);
     this.onFloorSelect = this.onFloorSelect.bind(this);
     this.onMapReady = this.onMapReady.bind(this);
-    // this.onMapSelection = this.onMapSelection.bind(this);
-    // this.onBoxSelection = this.onBoxSelection.bind(this);
-    // this.onCenterChange = this.onCenterChange.bind(this);
     this.onSourceChange = this.onSourceChange.bind(this);
     this.onSyntheticChange = this.onSyntheticChange.bind(this);
     this.onStyleChange = this.onStyleChange.bind(this);
@@ -127,19 +116,20 @@ export class MapComponent implements OnInit, OnDestroy {
         if (poi && !this.endPoi) {
           this.centerOnPoi(poi);
         }
-        // this.generateRoute();
+        this.generateRoute();
       }),
       this.sidebarService.getEndPointListener().subscribe(poi => {
         this.endPoi = poi;
         if (poi && !this.startPoi) {
           this.centerOnPoi(poi);
         }
-        // this.generateRoute();
+        this.generateRoute();
       }),
-      // this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
-       // this.accessibleOnly = accessibleOnly;
-       // this.generateRoute();
-      // }),
+      this.sidebarService.getAccessibleOnlyToggleListener().subscribe(accessibleOnly => {
+       this.accessibleOnly = accessibleOnly;
+       this.routingSource.toggleAccessible(accessibleOnly);
+       this.generateRoute();
+      }),
       this.sidebarService.getSelectedPlaceListener().subscribe(place => {
         this.setPlace(place);
       })
@@ -161,15 +151,16 @@ export class MapComponent implements OnInit, OnDestroy {
 
   async fetch() {
     const { places, style, styles } = await Repository.getPackage();
+    const place = places.length > 0 ? places[0] : new Place({});
+    style.center = [place.lng, place.lat];
     this.geojsonSource.fetch(this.features);
+    this.routingSource.routing.setData(new FeatureCollection(this.features));
     this.onSourceChange();
     this.prepareStyle(style);
-    const place = places.length > 0 ? places[0] : new Place({});
     this.imageSourceManager.belowLayer = style.usesPrefixes() ? 'proximiio-floors' : 'floors';
     this.imageSourceManager.initialize();
     this.state = {
       ...this.state,
-      amenities: this.amenities,
       initializing: false,
       place,
       places,
@@ -180,8 +171,6 @@ export class MapComponent implements OnInit, OnDestroy {
       noPlaces: places.length === 0
     };
     style.observe(this.onStyleChange);
-    await this.onPlaceSelect(this.state.place);
-    console.log(this.state);
   }
 
   prepareStyle(style: Style) {
@@ -193,12 +182,16 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   onRouteChange(event?: string) {
+    console.log(event);
     if (event === 'loading-start') {
       this.state = {...this.state, loadingRoute: true};
       return;
     }
 
     if (event === 'loading-finished') {
+      console.log(this.routingSource);
+      const routeStart = this.routingSource.lines[this.routingSource.start.properties.level];
+      this.centerOnRoute(routeStart);
       this.state = {...this.state, loadingRoute: false};
       return;
     }
@@ -213,7 +206,6 @@ export class MapComponent implements OnInit, OnDestroy {
   onSourceChange() {
     this.state = {
       ...this.state,
-      selected: this.state.selected.map(feature => this.geojsonSource.get(feature.id) || this.geojsonSource.getInternal(feature.properties.id)),
       style: this.state.style
     };
     this.updateMapSource(this.geojsonSource);
@@ -247,8 +239,6 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   onStyleChange(event?: string, data?: any) {
-    console.log('onStyleChange', event, data);
-
     const map = this.map;
     if (map) {
       if (event === 'polygon-editing-toggled') {
@@ -315,8 +305,18 @@ export class MapComponent implements OnInit, OnDestroy {
         });
       }
     }
+
+    if (event === 'filter-change') {
+      // tslint:disable-next-line:no-shadowed-variable
+      const map = this.map;
+      this.state.style.getLayers('main').forEach(layer => {
+        if (map.getLayer(layer.id)) {
+          map.removeLayer(layer.id);
+        }
+        map.addLayer(layer);
+      });
+    }
     // this.map.setStyle(this.state.style);
-    console.log('new style set', this.state.style);
     this.state = {...this.state, style: this.state.style};
   }
 
@@ -328,7 +328,23 @@ export class MapComponent implements OnInit, OnDestroy {
     }
   }
 
-  onMapReady() {
+  onLoad(map) {
+    this.map = map;
+    this.onMapReady();
+    this.mapLoaded.emit(true);
+    this.map.resize();
+    this.subs.push(
+      this.sidebarService.getSidebarStatusListener().subscribe(() => {
+        if (this.map) {
+          setTimeout(() => {
+            this.map.resize();
+          }, 500);
+        }
+      })
+    );
+  }
+
+  async onMapReady() {
     // set paths visible if available
     const map = this.map;
     if (map) {
@@ -352,13 +368,14 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
       map.setMaxZoom(30);
-      // const decodedChevron = await getImageFromBase64(chevron)
-      // map.addImage('chevron_right', decodedChevron as any)
+      const decodedChevron = await getImageFromBase64(chevron);
+      map.addImage('chevron_right', decodedChevron as any);
       this.updateMapSource(this.geojsonSource);
       this.updateMapSource(this.routingSource);
       this.updateCluster();
       // map.setStyle(this.state.style);
       this.imageSourceManager.setLevel(map, this.state.floor.level);
+      await this.onPlaceSelect(this.state.place);
     }
   }
 
@@ -376,6 +393,10 @@ export class MapComponent implements OnInit, OnDestroy {
         source.setData(data);
       }
     }
+  }
+
+  setPlace(place) {
+    this.onPlaceSelect(new Place(place));
   }
 
   async onPlaceSelect(place: Place) {
@@ -400,16 +421,41 @@ export class MapComponent implements OnInit, OnDestroy {
     }
   }
 
+  onFloorChange(way) {
+    let floor;
+    const nextLevel = way === 'up' ? this.state.floor.level + 1 : this.state.floor.level - 1;
+    floor = this.state.floors.filter(f => f.level === nextLevel) ? this.state.floors.filter(f => f.level === nextLevel)[0] : this.state.floor;
+    this.onFloorSelect(new Floor(floor));
+  }
+
   onFloorSelect(floor: Floor) {
     const map = this.map;
+    const route = this.routingSource.route && this.routingSource.route[floor.level] ? this.routingSource.route[floor.level] : null;
     if (map) {
       this.state.style.setLevel(floor.level);
-      [...this.state.style.getLayers('main'), ...this.state.style.getLayers('route')].forEach(layer => map.setFilter(layer.id, layer.filter));
       map.setStyle(this.state.style);
-      this.imageSourceManager.setLevel(map, floor.level);
+      setTimeout(() => {
+        [...this.state.style.getLayers('main'), ...this.state.style.getLayers('route')].forEach(layer => {
+          if (map.getLayer(layer.id)) {
+            map.setFilter(layer.id, layer.filter);
+          }
+        });
+        this.imageSourceManager.setLevel(map, floor.level);
+      });
+      if (route) {
+        this.centerOnRoute(route);
+      }
     }
     this.state = {...this.state, floor, style: this.state.style};
     this.updateCluster();
+  }
+
+  generateRoute() {
+    if (this.startPoi && this.endPoi) {
+      this.onRouteUpdate(this.startPoi, this.endPoi);
+    } else if (!this.startPoi || !this.endPoi) {
+      this.onRouteCancel();
+    }
   }
 
   onRouteUpdate(start?: Feature, finish?: Feature) {
@@ -430,45 +476,29 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   centerOnPoi(poi) {
-    const floor = this.state.floors.find(f => f.level === poi.level);
-    // this.mapCenter = poi.coordinates;
-    // this.mapZoom = [21];
-    this.onFloorSelect(new Floor(floor));
-    // this.setFloor(floor);
+    const floor = this.state.floors.find(f => f.level === poi.properties.level);
+    this.onFloorSelect(floor);
+    if (this.map) {
+      this.map.flyTo({ center: poi.coordinates });
+    }
+  }
+
+  centerOnRoute(route: Feature) {
+    if (this.state.floor.level !== parseInt(route.properties.level, 0)) {
+      // TODO: fix set floor on route start point, currently bugged because of JSON circular stuff
+      const floor = this.state.floors.find(f => f.level === parseInt(route.properties.level, 0));
+      // this.onFloorSelect(floor);
+    }
+    if (this.map) {
+      const bbox = turf.bbox(route.geometry);
+      this.map.fitBounds(bbox, { padding: 50 });
+    }
   }
 
   onResized(event: ResizedEvent) {
     if (this.map) {
       this.map.resize();
     }
-  }
-
-  onFloorChange(way) {
-    let floor;
-    const nextLevel = way === 'up' ? this.state.floor.level + 1 : this.state.floor.level - 1;
-    floor = this.state.floors.filter(f => f.level === nextLevel) ? this.state.floors.filter(f => f.level === nextLevel)[0] : this.state.floor;
-    this.onFloorSelect(new Floor(floor));
-  }
-
-  setPlace(place) {
-    this.onPlaceSelect(new Place(place));
-  }
-
-  onLoad(map) {
-    mapa = map;
-    this.map = map;
-    this.onMapReady();
-    this.mapLoaded.emit(true);
-    this.map.resize();
-    this.subs.push(
-      this.sidebarService.getSidebarStatusListener().subscribe(() => {
-        if (this.map) {
-          setTimeout(() => {
-            this.map.resize();
-          }, 500);
-        }
-      })
-    );
   }
 
   updateImages() {

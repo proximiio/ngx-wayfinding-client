@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { isPointWithinRadius } from 'geolib';
 import { AuthService } from '../../auth/auth.service';
 import { SidebarService } from './sidebar.service';
+import Place from '../../map/models/place.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -38,7 +39,7 @@ export class SidebarComponent implements OnInit {
     this.currentUserData = this.authService.getCurrentUserData();
     this.places = this.currentUserData.places;
     this.floors = this.currentUserData.floors;
-    this.selectedPlace = this.currentUserData.defaultPlace;
+    this.selectedPlace = this.places.length > 0 ? this.places[0] : new Place({});
     this.features = this.currentUserData.features;
     this.filteredFeatures = [...this.currentUserData.features.features];
     this.customPois = this.currentUserData.customPois ? this.currentUserData.customPois : [];
@@ -75,17 +76,17 @@ export class SidebarComponent implements OnInit {
         .filter(item => item.isInside);
     } else {
       sortedPois = this.filteredFeatures
-        .filter(feature => feature.properties.usecase === 'poi')
+        .filter(feature => (feature.properties.usecase === 'poi' || feature.properties.type === 'poi'))
         .sort((a, b) => a.properties.title > b.properties.title ? -1 : 1)
         .sort((a, b) => a.properties.level > b.properties.level ? 1 : -1)
         .map(item => {
           const isInside = isPointWithinRadius(
             {lat: item.geometry.coordinates[1], lng: item.geometry.coordinates[0]},
             {lat: this.selectedPlace.location.lat, lng: this.selectedPlace.location.lng},
-            10000
+            1000
           );
           return {
-            ...item.properties,
+            ...item,
             icon: this.amenities.filter(amenity => amenity.id === item.properties.amenity)[0] ? this.amenities.filter(amenity => amenity.id === item.properties.amenity)[0].icon : '',
             category: this.amenities.filter(amenity => amenity.id === item.properties.amenity)[0] ? this.amenities.filter(amenity => amenity.id === item.properties.amenity)[0].title : '',
             search_query: item.properties.title + ' ' + item.properties.level,
@@ -112,6 +113,7 @@ export class SidebarComponent implements OnInit {
   }
 
   onPlaceSelect(place) {
+    this.selectedPlace = place;
     this.pois = this.sortedPOIs;
     this.sidebarService.selectedPlaceListener.next(place);
   }

@@ -2,7 +2,6 @@ import Observable from '../observable';
 import Repository from '../repository';
 import Floor from '../models/floor.model';
 import { ImageSourceRaw, RasterLayout } from 'mapbox-gl';
-import { AuthService } from '../../auth/auth.service';
 
 export default class ImageSourceManager extends Observable {
   sources: string[] = [];
@@ -11,7 +10,7 @@ export default class ImageSourceManager extends Observable {
   belowLayer = 'proximiio-floors';
   enabled = true;
 
-  constructor(private authService: AuthService) {
+  constructor() {
     super();
   }
 
@@ -41,7 +40,6 @@ export default class ImageSourceManager extends Observable {
 
     if (this.enabled) {
       const floors = this.floors.filter(floor => floor.hasFloorplan && floor.level === level);
-      console.log('add floorplan', floors);
       floors.forEach(floor => {
         const source = {
           type: 'image',

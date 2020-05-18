@@ -25,6 +25,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@ng-select/ng-select": "^3.6.0",
     "@turf/along": "^6.0.1",
+    "@turf/turf": "^5.1.6",
     "ahoy.js": "^0.3.4",
     "angular-resize-event": "^1.1.1",
     "deep-diff": "^1.0.2",

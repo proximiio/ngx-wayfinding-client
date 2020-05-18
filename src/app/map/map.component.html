@@ -22,16 +22,21 @@
         </a>
       </li>
     </ul>-->
+    <!-- TODO: move between the floors by levels -->
     <ul>
       <li>
+        <span *ngIf="routingSource.finish && state.floor.level < routingSource.finish.properties.level">{{ routingSource.finish.properties.level }}</span>
         <a href="javascript:;"
+           [ngClass]="{'blinking': routingSource.finish && state.floor.level < routingSource.finish.properties.level}"
            (click)="onFloorChange('up')">
           <fa-icon [icon]="['fal', 'chevron-up']"></fa-icon>
         </a>
       </li>
       <li class="current-floor">{{ state.floor.level }}</li>
       <li>
+        <span *ngIf="routingSource.finish && state.floor.level > routingSource.finish.properties.level">{{ routingSource.finish.properties.level }}</span>
         <a href="javascript:;"
+           [ngClass]="{'blinking': routingSource.finish && state.floor.level > routingSource.finish.properties.level}"
            (click)="onFloorChange('down')">
           <fa-icon [icon]="['fal', 'chevron-down']"></fa-icon>
         </a>

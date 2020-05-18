@@ -1,4 +1,6 @@
-class Wayfinding {
+import * as turf from '@turf/turf';
+
+export class Wayfinding {
 
     /**
      *
@@ -1635,3 +1637,5 @@ class Wayfinding {
         return 0;
     }
 }
+
+export default Wayfinding;

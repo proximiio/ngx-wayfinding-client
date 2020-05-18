@@ -1,4 +1,4 @@
-import Wayfinding from './wayfinding';
+import { Wayfinding } from './wayfinding';
 import Feature, { FeatureCollection } from './models/feature.model';
 import { lineString } from '@turf/helpers';
 
@@ -22,8 +22,30 @@ export default class Routing {
     // });
   }
 
+  toggleOnlyAccessible(onlyAccessible) {
+    if (onlyAccessible) {
+      this.wayfinding.setConfiguration({
+        avoidStaircases: true,
+        avoidBarriers: true,
+        avoidNarrowPaths: true,
+        avoidRevolvingDoors: true,
+        avoidTicketGates: true
+      });
+    } else {
+      this.wayfinding.setConfiguration({
+        avoidElevators: false,
+        avoidEscalators: false,
+        avoidStaircases: false,
+        avoidRamps: false,
+        avoidNarrowPaths: false,
+        avoidRevolvingDoors: false,
+        avoidTicketGates: false,
+        avoidBarriers: false
+      });
+    }
+  }
+
   route(start: Feature, finish: Feature) {
-    console.log('routing with start', start, 'finish', finish);
     const points = this.wayfinding.runAStar(start, finish);
     if (!points) {
       return null;
