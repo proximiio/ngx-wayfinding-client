@@ -1,6 +1,6 @@
 import { Wayfinding } from './wayfinding';
 import Feature, { FeatureCollection } from './models/feature.model';
-import { lineString } from '@turf/helpers';
+import { lineString, point } from '@turf/helpers';
 
 export default class Routing {
   data: FeatureCollection;
@@ -52,6 +52,7 @@ export default class Routing {
     }
 
     const levelPoints = {} as any;
+    // tslint:disable-next-line:no-shadowed-variable
     points.forEach((point: any) => {
       if (typeof levelPoints[point.properties.level] === 'undefined') {
         levelPoints[point.properties.level] = [];
@@ -62,7 +63,14 @@ export default class Routing {
     const levels = Object.keys(levelPoints);
     const levelPaths = {} as any;
     levels.forEach(level => {
-      levelPaths[level] = new Feature(lineString(levelPoints[level].map((point: any) => point.geometry.coordinates)));
+      if (levelPoints[level].length > 1) {
+        // tslint:disable-next-line:no-shadowed-variable
+        levelPaths[level] = new Feature(lineString(levelPoints[level].map((point: any) => point.geometry.coordinates)));
+      } else {
+        // tslint:disable-next-line:no-shadowed-variable
+        levelPaths[level] = new Feature(point(levelPoints[level].map((point: any) => point.geometry.coordinates)));
+      }
+
     });
     return levelPaths;
   }

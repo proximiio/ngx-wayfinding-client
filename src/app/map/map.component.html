@@ -25,7 +25,7 @@
     <!-- TODO: move between the floors by levels -->
     <ul>
       <li>
-        <span *ngIf="routingSource.finish && state.floor.level < routingSource.finish.properties.level">{{ routingSource.finish.properties.level }}</span>
+        <span *ngIf="routingSource.finish && state.floor.level < routingSource.finish.properties.level">{{ getUpcomingFloorNumber('up') }}</span>
         <a href="javascript:;"
            [ngClass]="{'blinking': routingSource.finish && state.floor.level < routingSource.finish.properties.level}"
            (click)="onFloorChange('up')">
@@ -34,7 +34,7 @@
       </li>
       <li class="current-floor">{{ state.floor.level }}</li>
       <li>
-        <span *ngIf="routingSource.finish && state.floor.level > routingSource.finish.properties.level">{{ routingSource.finish.properties.level }}</span>
+        <span *ngIf="routingSource.finish && state.floor.level > routingSource.finish.properties.level">{{ getUpcomingFloorNumber('down') }}</span>
         <a href="javascript:;"
            [ngClass]="{'blinking': routingSource.finish && state.floor.level > routingSource.finish.properties.level}"
            (click)="onFloorChange('down')">

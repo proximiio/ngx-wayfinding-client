@@ -182,16 +182,20 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   onRouteChange(event?: string) {
-    console.log(event);
     if (event === 'loading-start') {
       this.state = {...this.state, loadingRoute: true};
       return;
     }
 
     if (event === 'loading-finished') {
-      console.log(this.routingSource);
-      const routeStart = this.routingSource.lines[this.routingSource.start.properties.level];
+      const routeStart = this.routingSource.route[this.routingSource.start.properties.level];
       this.centerOnRoute(routeStart);
+      this.state = {...this.state, loadingRoute: false};
+      return;
+    }
+
+    if (event === 'route-undefined') {
+      console.log('route not found');
       this.state = {...this.state, loadingRoute: false};
       return;
     }
@@ -241,27 +245,6 @@ export class MapComponent implements OnInit, OnDestroy {
   onStyleChange(event?: string, data?: any) {
     const map = this.map;
     if (map) {
-      if (event === 'polygon-editing-toggled') {
-        if (this.state.style.polygonEditing) {
-          if (!this.state.style.segments) {
-            this.state.style.toggleSegments();
-          }
-          if (!this.state.style.routable) {
-            this.state.style.toggleRoutable();
-          }
-        } else {
-          if (this.state.style.overlay) {
-            this.state.style.toggleOverlay();
-          }
-          if (this.state.style.segments) {
-            this.state.style.toggleSegments();
-          }
-          if (this.state.style.routable) {
-            this.state.style.toggleRoutable();
-          }
-        }
-      }
-
       if (event === 'overlay-toggled') {
         const overlay = this.state.style.overlay ? 'visible' : 'none';
         map.setLayoutProperty('main-polygon-fill', 'visibility', overlay);
@@ -423,9 +406,14 @@ export class MapComponent implements OnInit, OnDestroy {
 
   onFloorChange(way) {
     let floor;
-    const nextLevel = way === 'up' ? this.state.floor.level + 1 : this.state.floor.level - 1;
+    let nextLevel = way === 'up' ? this.state.floor.level + 1 : this.state.floor.level - 1;
+    if (this.routingSource.route) {
+      nextLevel = this.getUpcomingFloorNumber(way);
+    }
     floor = this.state.floors.filter(f => f.level === nextLevel) ? this.state.floors.filter(f => f.level === nextLevel)[0] : this.state.floor;
-    this.onFloorSelect(new Floor(floor));
+    if (floor) {
+      this.onFloorSelect(new Floor(floor));
+    }
   }
 
   onFloorSelect(floor: Floor) {
@@ -443,7 +431,8 @@ export class MapComponent implements OnInit, OnDestroy {
         this.imageSourceManager.setLevel(map, floor.level);
       });
       if (route) {
-        this.centerOnRoute(route);
+        const bbox = turf.bbox(route.geometry);
+        map.fitBounds(bbox, { padding: 50 });
       }
     }
     this.state = {...this.state, floor, style: this.state.style};
@@ -476,22 +465,36 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   centerOnPoi(poi) {
-    const floor = this.state.floors.find(f => f.level === poi.properties.level);
-    this.onFloorSelect(floor);
+    if (this.state.floor.level !== parseInt(poi.properties.level, 0)) {
+      const floor = this.state.floors.find(f => f.level === poi.properties.level);
+      this.onFloorSelect(floor);
+    }
     if (this.map) {
       this.map.flyTo({ center: poi.coordinates });
     }
   }
 
   centerOnRoute(route: Feature) {
-    if (this.state.floor.level !== parseInt(route.properties.level, 0)) {
-      // TODO: fix set floor on route start point, currently bugged because of JSON circular stuff
-      const floor = this.state.floors.find(f => f.level === parseInt(route.properties.level, 0));
-      // this.onFloorSelect(floor);
+    if (route && route.properties) {
+      if (this.state.floor.level !== parseInt(route.properties.level, 0)) {
+        const floor = this.state.floors.find(f => f.level === parseInt(route.properties.level, 0));
+        this.onFloorSelect(floor);
+      }
+      if (this.map) {
+        const bbox = turf.bbox(route.geometry);
+        this.map.fitBounds(bbox, { padding: 50 });
+      }
     }
-    if (this.map) {
-      const bbox = turf.bbox(route.geometry);
-      this.map.fitBounds(bbox, { padding: 50 });
+  }
+
+  getUpcomingFloorNumber(way: string) {
+    if (this.routingSource.route) {
+      const currentRouteIndex = this.routingSource.lines.findIndex(route => +route.properties.level === this.state.floor.level);
+      const currentRoute = this.routingSource.lines[currentRouteIndex];
+      const nextRouteIndex = way === 'up' ? currentRouteIndex + 1 : currentRouteIndex - 1;
+      const nextRoute = this.routingSource.lines[nextRouteIndex];
+      // return currentRouteIndex !== -1 && nextRoute ? +nextRoute.properties.level : way === 'up' ? this.state.floor.level + 1 : this.state.floor.level - 1;
+      return nextRoute ? +nextRoute.properties.level : this.state.floor.level;
     }
   }
 

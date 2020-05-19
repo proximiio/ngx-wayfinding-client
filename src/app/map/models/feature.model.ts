@@ -16,7 +16,7 @@ export class FeatureCollection {
   features: Array<Feature>;
 
   constructor(data: any) {
-    this.features = (data.features || []).map((f: any) => new Feature(f));
+    this.features = (data.features || []).map((f: any) => new Feature(f).json);
   }
 
   get json() {

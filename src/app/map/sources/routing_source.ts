@@ -51,6 +51,7 @@ export default class RoutingSource extends DataSource {
         this.lines = lines;
       } else {
         this.lines = [];
+        this.notify('route-undefined');
       }
 
       // Older api routing
