@@ -34,8 +34,8 @@ app.get(Settings.basepath+'/auth', async (function(request, response, next) {
     const config = await (proximiApiInstance.get(`/config`));
     const floors = await (proximiApiInstance.get(`/core/floors`));
     const places = await (proximiApiInstance.get(`/core/places`));
-    const features = await (proximiApiInstance.get(`/v4/geo/features`));
-    const amenities = await (proximiApiInstance.get(`/v4/geo/amenities`));
+    const features = await (proximiApiInstance.get(`/${Settings.geo_version}/geo/features`));
+    const amenities = await (proximiApiInstance.get(`/${Settings.geo_version}/geo/amenities`));
 
     features.data.features = features.data.features.map(feature => {
       if (!feature.properties.title) {

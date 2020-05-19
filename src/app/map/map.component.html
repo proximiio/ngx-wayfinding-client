@@ -5,27 +5,27 @@
   <div class="map-floors">
     <ul>
       <li>
-        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'up'">{{ currentLevelChanger.nextLevel }}</span>
+        <span *ngIf="routingSource.finish && state.floor.level < routingSource.finish.properties.level">{{ getUpcomingFloorNumber('up') }}</span>
         <a href="javascript:;"
-           [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'up'}"
-           (click)="onFloorChange('up', currentLevelChanger)">
+           [ngClass]="{'blinking': routingSource.finish && state.floor.level < routingSource.finish.properties.level}"
+           (click)="onFloorChange('up')">
           <fa-icon [icon]="['fal', 'chevron-up']"></fa-icon>
         </a>
       </li>
-      <li class="current-floor">{{ selectedFloor ? selectedFloor.level : 0 }}</li>
+      <li class="current-floor">{{ state.floor.level }}</li>
       <li>
-        <span *ngIf="currentLevelChanger && currentLevelChanger.way === 'down'">{{ currentLevelChanger.nextLevel }}</span>
+        <span *ngIf="routingSource.finish && state.floor.level > routingSource.finish.properties.level">{{ getUpcomingFloorNumber('down') }}</span>
         <a href="javascript:;"
-           [ngClass]="{'blinking': currentLevelChanger && currentLevelChanger.way === 'down'}"
-           (click)="onFloorChange('down', currentLevelChanger)">
+           [ngClass]="{'blinking': routingSource.finish && state.floor.level > routingSource.finish.properties.level}"
+           (click)="onFloorChange('down')">
           <fa-icon [icon]="['fal', 'chevron-down']"></fa-icon>
         </a>
       </li>
     </ul>
   </div>
   <mgl-map
-    [style]="mapStyle"
-    [movingMethod]="mapMovingMethod"
+    *ngIf="!state.initializing"
+    [style]="state.style"
     (load)="onLoad($event)"
   >
     <ng-container *ngFor="let key of objectKeys(images)">
@@ -35,225 +35,5 @@
       >
       </mgl-image>
     </ng-container>
-    <mgl-geojson-source
-      [id]="Constants.SOURCE_POI"
-      [data]="featuresForLevel(level, true)"
-      [maxzoom]="24"
-    ></mgl-geojson-source>
-    <mgl-layer
-      type="symbol"
-      [id]="Constants.LAYER_POIS_ICONS"
-      [source]="Constants.SOURCE_POI"
-      [minzoom]="17"
-      [maxzoom]="24"
-      [filter]="
-          [
-            'all',
-            ['==', ['get', 'usecase'], 'poi'],
-            ['==', ['to-number', ['get', 'level']], level]
-          ]
-        "
-      [layout]="{
-          'icon-image': '{amenity}',
-          'icon-size': iconSize,
-          'symbol-placement': 'point',
-          'icon-allow-overlap': true,
-          'icon-ignore-placement': true,
-          'text-allow-overlap': true,
-          'visibility': showPOI ? 'visible' : 'none'
-        }"
-      (click)="onPoiClick($event)"
-    ></mgl-layer>
-    <mgl-layer
-      type="symbol"
-      [id]="Constants.LAYER_POIS_LABELS"
-      [source]="Constants.SOURCE_POI"
-      [minzoom]="18"
-      [maxzoom]="24"
-      [filter]="
-          [
-            'all',
-            ['==', ['get', 'usecase'], 'poi'],
-            ['==', ['to-number', ['get', 'level']], level]
-          ]
-        "
-      [layout]="{
-          'text-offset': [0, 2],
-          'text-field': ['get', 'title'],
-          'text-size': 14,
-          'text-font': [font],
-          'symbol-placement': 'point',
-          'text-allow-overlap': false,
-          'icon-allow-overlap': true,
-          'icon-ignore-placement': true,
-          'visibility': showPOI ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-geojson-source
-      [id]="Constants.SOURCE_ROUTING"
-      [data]="routeCollection"
-      [maxzoom]="24"
-    ></mgl-geojson-source>
-    <mgl-layer
-      type="symbol"
-      [id]="Constants.LAYER_ROUTING_SYMBOLS + '_line'"
-      [source]="Constants.SOURCE_ROUTING"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'route-line-symbol'
-          ]
-        "
-      [layout]="{
-          'icon-image': 'bluedot',
-          'icon-size': 0.25,
-          'symbol-placement': 'point',
-          'icon-allow-overlap': false,
-          'text-allow-overlap': false,
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="line"
-      [id]="Constants.LAYER_ROUTING_LINE"
-      [source]="Constants.SOURCE_ROUTING"
-      [minzoom]="10"
-      [maxzoom]="24"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'route-line'
-          ]
-        "
-      [paint]="routeLineStyle"
-      [layout]="{
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="symbol"
-      [id]="Constants.LAYER_ROUTING_SYMBOLS"
-      [source]="Constants.SOURCE_ROUTING"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'route-symbol'
-          ]
-        "
-      [layout]="{
-          'icon-image': '{icon}',
-          'icon-size': 0.4,
-          'symbol-placement': 'point',
-          'icon-allow-overlap': true,
-          'text-allow-overlap': false,
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-layer
-      type="symbol"
-      [id]="Constants.LAYER_FLOORCHANGE_SYMBOLS"
-      [source]="Constants.SOURCE_ROUTING"
-      [filter]="
-          [
-            '==',
-            ['get', 'usecase'], 'floor-change-symbol'
-          ]
-        "
-      [layout]="{
-          'icon-image': '{icon}',
-          'icon-size': 0.3,
-          'icon-offset': currentLevelChanger && currentLevelChanger.way === 'up' ? [4, -80] : [4, 90],
-          'symbol-placement': 'point',
-          'icon-allow-overlap': true,
-          'text-allow-overlap': false,
-          'visibility': !ignoreRoute ? 'visible' : 'none'
-        }"
-    ></mgl-layer>
-    <mgl-geojson-source
-      [id]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [data]="highlightPointsCollection"
-      [maxzoom]="24"
-    ></mgl-geojson-source>
-    <mgl-layer
-      *ngIf="highlightClickedPoi"
-      type="circle"
-      [id]="Constants.LAYER_HIGHLIGHT_CLICKED_POINT"
-      [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [minzoom]="17"
-      [maxzoom]="24"
-      [filter]="
-          [
-            'all',
-            ['==', ['get', 'usecase'], 'clicked-point-highlight'],
-            ['==', ['to-number', ['get', 'level']], level]
-          ]
-        "
-      [paint]="{
-        'circle-radius': 38,
-        'circle-blur': 0.5,
-        'circle-color': '#3887be'
-      }"
-      [before]="Constants.LAYER_POIS_ICONS"
-    ></mgl-layer>
-    <mgl-layer
-      *ngIf="highlightSelectedPoi"
-      type="circle"
-      [id]="Constants.LAYER_HIGHLIGHT_STARTPOI_POINT"
-      [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [minzoom]="17"
-      [maxzoom]="24"
-      [filter]="
-          [
-            'all',
-            ['==', ['get', 'usecase'], 'startpoi-point-highlight'],
-            ['==', ['to-number', ['get', 'level']], level]
-          ]
-        "
-      [paint]="{
-        'circle-radius': 38,
-        'circle-blur': 0.5,
-        'circle-color': '#40dc7e'
-      }"
-      [before]="Constants.LAYER_POIS_ICONS"
-    ></mgl-layer>
-    <mgl-layer
-      *ngIf="highlightSelectedPoi"
-      type="circle"
-      [id]="Constants.LAYER_HIGHLIGHT_ENDPOI_POINT"
-      [source]="Constants.SOURCE_HIGHLIGHT_POINTS"
-      [minzoom]="17"
-      [maxzoom]="24"
-      [filter]="
-          [
-            'all',
-            ['==', ['get', 'usecase'], 'endpoi-point-highlight'],
-            ['==', ['to-number', ['get', 'level']], level]
-          ]
-        "
-      [paint]="{
-        'circle-radius': 38,
-        'circle-blur': 0.5,
-        'circle-color': '#8a7fff'
-      }"
-      [before]="Constants.LAYER_POIS_ICONS"
-    ></mgl-layer>
-    <div *ngIf="floorplans.length > 0">
-      <ng-container *ngFor="let floorplan of floorplans">
-        <mgl-image-source
-          [id]="floorplan.source.id"
-          [url]="floorplan.source.url"
-          [coordinates]="floorplan.source.coordinates"
-        ></mgl-image-source>
-        <mgl-layer
-          [id]="floorplan.layer.id"
-          [source]="floorplan.source.id"
-          type="raster"
-          [minzoom]="12"
-          [before]="Constants.LAYER_FLOORS"
-          [paint]="floorplan.layer.paint"
-          [layout]="floorplan.layer.layout"
-        ></mgl-layer>
-      </ng-container>
-    </div>
   </mgl-map>
 </div>

@@ -12,28 +12,28 @@
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>{{ endPointLabel }}</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn">
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="properties.title" (change)="onEndPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
-        {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span class="level">L<small>{{ item.level }}</small></span>
+        {{ item.properties.title | slice: 0:18 }} {{ item.properties.title.length > 18 ? '...' : '' }}
+        <span class="level">L<small>{{ item.properties.level }}</small></span>
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'search']" transform="up-3"></fa-icon></span>
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>{{ startPointLabel }}</mat-label>
-    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
+    <ng-select ngSelectMat groupBy="category" [items]="pois" bindLabel="properties.title" (change)="onStartPointSelect($event)" [searchFn]="poiSearchFn">
       <ng-template ng-optgroup-tmp let-item="item" let-index="index">
         {{ item.category }}
       </ng-template>
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <img height="28" width="28" [src]="item.icon"/>
-        {{ item.title | slice: 0:18 }} {{ item.title.length > 18 ? '...' : '' }}
-        <span class="level">L<small>{{ item.level }}</small></span>
+        {{ item.properties.title | slice: 0:18 }} {{ item.properties.title.length > 18 ? '...' : '' }}
+        <span class="level">L<small>{{ item.properties.level }}</small></span>
       </ng-template>
     </ng-select>
     <span matPrefix><fa-icon [icon]="['fal', 'dot-circle']" transform="up-3"></fa-icon></span>

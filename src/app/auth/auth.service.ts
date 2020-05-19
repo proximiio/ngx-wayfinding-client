@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LocalStorageService } from '../core/local-storage.service';
 import { SessionStorageService } from '../core/session-storage.service';
+import { axios } from '../map/common';
 
 const AUTH_URL = environment.authUrl;
 export const AUTH_KEY = 'AUTH';
@@ -63,6 +64,7 @@ export class AuthService {
             this.user = response['user'];
             this.config = response['config'];
             this.data = response['data'];
+            this.setAxios(token);
             this.authStatusListener.next(true);
             this.saveAuthData(token, this.user, this.config, this.data);
             this.router.navigate(['/']);
@@ -80,6 +82,7 @@ export class AuthService {
       return;
     }
     this.token = authInformation.token;
+    this.setAxios(this.token);
     this.isAuthenticated = true;
     this.user = authInformation.user;
     this.config = authInformation.config;
@@ -89,6 +92,7 @@ export class AuthService {
 
   logout() {
     this.token = null;
+    this.setAxios();
     this.isAuthenticated = false;
     this.authStatusListener.next(false);
     this.user = null;
@@ -121,5 +125,13 @@ export class AuthService {
       return;
     }
     return data;
+  }
+
+  private setAxios(token?: string) {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common.Authorization;
+    }
   }
 }
