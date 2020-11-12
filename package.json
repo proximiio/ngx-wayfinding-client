@@ -48,7 +48,7 @@
     "@types/jasminewd2": "~2.0.8",
     "@types/mapbox-gl": "^1.5.2",
     "@types/node": "~12.12.7",
-    "asyncawait": "^1.0.8",
+    "asyncawait": "^3.0.0",
     "axios": "^0.19.2",
     "body-parser": "^1.18.2",
     "codelyzer": "^5.2.0",
