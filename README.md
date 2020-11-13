@@ -10,13 +10,26 @@ npm install
 
 to install all dependencies, this is required only for the first time after cloning this source.
 
+In case of any issues, please try to run `npm install` with `--production` flag.
+
+```
+npm install --production
+```
+
 ## Running production environment & settings
 
-As first it's required to fill the `token` variable in `settings.js` file with yours proximi.io master token. Without it, application would not be able to log in.
+We strongly recommend to using the latest version of **Node.js**.
+
+As first, it's required to fill the `token` variable in `settings.js` file with yours proximi.io master token. Without it, application would not be able to log in.
 
 In the same file you can also change `port` and `basepath` variables but it's necessary to do subsequently changes to `./src/environments` files and `./angular.json` file on line 26 (a.k.a 'baseHref' property). These steps are completely optional.
 
-To run production server you should run
+To run production server with node.js >= 7.10.1 you should run
+```
+node server-es6.js
+```
+
+To run production server with node.js < 7.10.1 you should run
 ```
 node server.js
 ```
