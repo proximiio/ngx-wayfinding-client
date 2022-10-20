@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  authUrl: 'http://localhost:6005/kalasatama',
-  ahoyUrl: 'http://localhost:6005/kalasatama/analytics',
+  authUrl: 'http://localhost:6021/kalasatama',
+  ahoyUrl: 'http://localhost:6021/kalasatama/analytics',
   appPrefix: 'ngx-wayfinding-'
 };
 

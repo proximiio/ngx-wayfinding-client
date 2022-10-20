@@ -1,15 +1,13 @@
-var http = require('http');
-var express = require('express');
-var app = express();
-var Settings = require('./settings');
-var httpPort = process.env.PORT || Settings.port;
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var axios = require('axios');
-var _ = require('lodash');
-var path = require('path');
-var async = require('asyncawait/async');
-var await = require('asyncawait/await');
+const http = require('http');
+const express = require('express');
+const app = express();
+const Settings = require('./settings');
+const httpPort = process.env.PORT || Settings.port;
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const axios = require('axios');
+const _ = require('lodash');
+const path = require('path');
 
 const proximiApiInstance = axios.create({
   baseURL: Settings.proximi_api
@@ -28,14 +26,14 @@ app.get(Settings.basepath+'/token', function(request, response) {
   response.send(Settings.token);
 });
 
-app.get(Settings.basepath+'/auth', async (function(request, response, next) {
+app.get(Settings.basepath+'/auth', async (request, response, next) => {
   try {
-    const currentUser = await (proximiApiInstance.get(`/core/current_user`));
-    const config = await (proximiApiInstance.get(`/config`));
-    const floors = await (proximiApiInstance.get(`/core/floors`));
-    const places = await (proximiApiInstance.get(`/core/places`));
-    const features = await (proximiApiInstance.get(`/v4/geo/features`));
-    const amenities = await (proximiApiInstance.get(`/v4/geo/amenities`));
+    const currentUser = await proximiApiInstance.get(`/core/current_user`);
+    const config = await proximiApiInstance.get(`/config`);
+    const floors = await proximiApiInstance.get(`/core/floors`);
+    const places = await proximiApiInstance.get(`/core/places`);
+    const features = await proximiApiInstance.get(`/v4/geo/features`);
+    const amenities = await proximiApiInstance.get(`/v4/geo/amenities`);
 
     features.data.features = features.data.features.map(feature => {
       if (!feature.properties.title) {
@@ -45,7 +43,7 @@ app.get(Settings.basepath+'/auth', async (function(request, response, next) {
     });
 
     const defaultLevel = config.data.default_floor_number ? config.data.default_floor_number : 0;
-    const defaultFloor = floors.data.filter(floor => floor.level === defaultLevel)[0];
+    const defaultFloor = floors.data.filter(floor => floor.level === defaultLevel)[1];
     const defaultPlace = places.data.filter(place => place.id === defaultFloor.place_id)[0];
 
     response.send({
@@ -63,16 +61,17 @@ app.get(Settings.basepath+'/auth', async (function(request, response, next) {
   } catch (error) {
     next(error);
   }
-}));
+});
 
-app.get(Settings.basepath+'/*', function(req,res) {
+app.get(Settings.basepath+'/*',(req,res) => {
   res.sendFile(path.join(__dirname,'dist/ngx-wayfinding-client/index.html'));
 });
 
-app.post(Settings.basepath+'/analytics/ahoy/visits', function(request, response) {
+app.post(Settings.basepath+'/analytics/ahoy/visits', function(request, res) {
   const data = request.body;
   data.type = 'ahoy-visit';
   proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
+    console.log(response.data);
     res.send(response.data);
   })
   .catch(function (error) {
@@ -81,7 +80,7 @@ app.post(Settings.basepath+'/analytics/ahoy/visits', function(request, response)
   });
 });
 
-app.post(Settings.basepath+'/analytics/ahoy/events', function(request, response) {
+app.post(Settings.basepath+'/analytics/ahoy/events', function(request, res) {
   const data = request.body;
   data.type = 'ahoy-event';
   proximiApiInstance.post(`/v4/geo/metrics`, data).then(function (response) {
@@ -94,6 +93,6 @@ app.post(Settings.basepath+'/analytics/ahoy/events', function(request, response)
 });
 
 const server = http.createServer(app);
-server.listen(httpPort, '127.0.0.1', function() {
+server.listen(httpPort, '127.0.0.1', () => {
   console.log(`** Production Server is listening on localhost:${httpPort}, open your browser on http://localhost:${httpPort}${Settings.basepath} **`)
 });
