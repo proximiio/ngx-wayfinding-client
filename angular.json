@@ -23,7 +23,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": false,
-            "baseHref": "/k-supermarket/",
+            "baseHref": "/supermarket/",
             "assets": [
               "src/favicon.ico",
               "src/assets"

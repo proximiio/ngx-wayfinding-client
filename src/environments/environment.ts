@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  authUrl: 'http://localhost:6004/k-supermarket',
-  ahoyUrl: 'http://localhost:6004/k-supermarket/analytics',
+  authUrl: 'http://localhost:6032/supermarket',
+  ahoyUrl: 'http://localhost:6032/supermarket/analytics',
   appPrefix: 'ngx-wayfinding-'
 };
 
